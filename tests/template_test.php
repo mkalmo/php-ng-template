@@ -23,15 +23,23 @@ class ParserTests extends UnitTestCase {
         $node = $doc->createTextNode('{{ $var }}');
         $doc->appendChild($node);
 
-        tpl\processBind($node, ['$var' => 'hello']);
+        tpl\processBind($node, new tpl\Scope(['$var' => 'hello']));
 
         $this->assertEqual('hello' . PHP_EOL, $this->asText($doc));
+    }
+
+    function test_canProcessBindExpressionsInAttributes() {
+        $node = $this->createNode('<input value="{{ $var }}" />');
+
+        tpl\processBindOnAttribute($node, new tpl\Scope(['$var' => 'hello']));
+
+        $this->assertEqual('<input value="hello">', $this->asText($node));
     }
 
     function test_whenIfConditionIsTrue_contentRemains() {
         $node = $this->createNode('<div tpl-if="$flag">1</div>');
 
-        tpl\processIf($node, ['$flag' => true]);
+        tpl\processIf($node, new tpl\Scope(['$flag' => true]));
 
         $this->assertEqual('<div>1</div>', $this->asText($node));
     }
@@ -41,15 +49,9 @@ class ParserTests extends UnitTestCase {
 
         $parent = $node->parentNode;
 
-        tpl\processIf($node, ['$flag' => false]);
+        tpl\processIf($node, new tpl\Scope(['$flag' => false]));
 
         $this->assertNoPattern('/42/', $this->asText($parent));
-    }
-
-    function createNode($source) {
-        $doc = new DOMDocument('1.0');
-        $doc->loadHTML($source);
-        return getNodeByTagName($doc, 'body')->firstChild;
     }
 
     function test_canProcessForExpression() {
@@ -57,10 +59,16 @@ class ParserTests extends UnitTestCase {
 
         $parent = $node->parentNode;
 
-        tpl\processFor($node, ['$list' => [42, 24]]);
+        tpl\processFor($node, new tpl\Scope(['$list' => [42, 24]]));
 
         $this->assertPattern('/42/', $this->asText($parent));
         $this->assertPattern('/24/', $this->asText($parent));
+    }
+
+    function createNode($source) {
+        $doc = new DOMDocument('1.0');
+        $doc->loadHTML($source);
+        return getNodeByTagName($doc, 'body')->firstChild;
     }
 
     function getDocument($node) {
@@ -79,13 +87,6 @@ class ParserTests extends UnitTestCase {
     function asText($node) {
         return $this->getDocument($node)->saveHTML($node);
     }
-
-    function getNode() {
-        $doc = new DOMDocument('1.0');
-        $node = $doc->createElement('div');
-        return $doc->appendChild($node);
-    }
-
 }
 
 class ArrayFindTests extends UnitTestCase {

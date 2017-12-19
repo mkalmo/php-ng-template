@@ -2,11 +2,13 @@
 
 namespace {
 
+    use tpl\Scope;
+
     function render_template($templatePath, $data) {
         $node = new DOMDocument();
         $node->loadHTMLFile($templatePath);
 
-        tpl\traverse($node, $data);
+        tpl\traverse($node, new Scope($data));
 
         return $node->saveHTML();
     }
@@ -15,14 +17,13 @@ namespace {
 
 namespace tpl {
 
-    require_once('../src/helpers.php');
-
     const ATTRIBUTE_IF = 'tpl-if';
     const ATTRIBUTE_FOR = 'tpl-foreach';
     const ATTRIBUTE_INCLUDE = 'tpl-include';
 
     function traverse($node, $scope) {
 
+        processBindOnAttribute($node, $scope);
         processIf($node, $scope);
         processFor($node, $scope);
         processBind($node, $scope);
@@ -53,17 +54,29 @@ namespace tpl {
         return $childNodes;
     }
 
+    function processBindOnAttribute($node, $scope) {
+        foreach (getAttributes($node) as $entry) {
+            $node->removeAttribute($entry->key);
+            $node->setAttribute($entry->key,
+                replaceCurlyExpression($entry->value, $scope));
+        }
+    }
+
     function processBind($node, $scope) {
         if (! $node instanceof \DOMText) {
             return;
         }
 
-        $node->nodeValue = preg_replace_callback(
+        $node->nodeValue = replaceCurlyExpression($node->wholeText, $scope);
+    }
+
+    function replaceCurlyExpression($text, $scope) {
+        return preg_replace_callback(
             '|{{\s*([$a-z0-9\.]*)\s*}}|im',
-            function ($m) use ($scope) {
-                return $scope[$m[1]];
+            function ($matches) use ($scope) {
+                return $scope->evaluate($matches[1]);
             },
-            $node->wholeText);
+            $text);
     }
 
     function processIf($node, $scope) {
@@ -73,7 +86,7 @@ namespace tpl {
 
         $expression = getAttributeValue($node, ATTRIBUTE_IF);
 
-        if (!$scope[$expression]) {
+        if (!$scope->evaluate($expression)) {
             $parent = $node->parentNode;
             $parent->removeChild($node);
         }
@@ -103,16 +116,16 @@ namespace tpl {
 
         $expression = getAttributeValue($node, ATTRIBUTE_FOR);
 
-        $list = $scope[$expression];
+        $list = $scope->evaluate($expression);
 
         $parent = $node->parentNode;
 
         foreach ($list as $each) {
             $newNode = $node->cloneNode(true);
             $newNode->removeAttribute('tpl-foreach');
-            $scope['$each'] = $each;
+            $scope->addEntry('$each', $each);
             traverse($newNode, $scope);
-            unset($scope['$each']);
+            $scope->removeEntry('$each');
             $parent->insertBefore($newNode, $node);
         }
 
@@ -149,6 +162,32 @@ namespace tpl {
         return $found->value;
     }
 
+    class Scope {
+        private $data;
+
+        public function __construct($data = []) {
+            $this->data = $data;
+        }
+
+        public function evaluate($expression) {
+            return isset($this->data[$expression])
+                ? $this->data[$expression]
+                : '';
+        }
+
+        public function addEntry($key, $value) {
+            $this->data[$key] = $value;
+        }
+
+        public function removeEntry($key) {
+            unset($this->data[$key]);
+        }
+
+        public function __toString() {
+            return '' + print_r($this->data, true);
+        }
+    }
+
     class Entry {
         public $key;
         public $value;
@@ -162,4 +201,14 @@ namespace tpl {
             return $this->key . "->" . $this->value;
         }
     }
+
+    function array_find($array, $predicate) {
+        $list = array_values(array_filter($array, $predicate));
+        if (sizeof($list) > 1) {
+            throw new UnexpectedValueException("found more than one");
+        }
+
+        return sizeof($list) == 0 ? NULL : $list[0];
+    }
+
 }
