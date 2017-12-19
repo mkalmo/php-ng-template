@@ -17,16 +17,18 @@ namespace tpl {
 
     require_once('../src/helpers.php');
 
-    const ATTRIBUTE_FOREACH = 'tpl-foreach';
     const ATTRIBUTE_IF = 'tpl-if';
+    const ATTRIBUTE_FOR = 'tpl-foreach';
+    const ATTRIBUTE_INCLUDE = 'tpl-include';
 
     function traverse($node, $scope) {
 
         processIf($node, $scope);
         processFor($node, $scope);
         processBind($node, $scope);
+        processInclude($node, $scope);
 
-        if (hasAttribute($node, ATTRIBUTE_FOREACH)) {
+        if (hasAttribute($node, ATTRIBUTE_FOR)) {
             return; // contents is already processed
         }
 
@@ -65,37 +67,41 @@ namespace tpl {
     }
 
     function processIf($node, $scope) {
-        $attributes = getAttributes($node);
-
-        $ifs = array_values(array_filter($attributes, function($each) {
-            return $each->key == ATTRIBUTE_IF;
-        }));
-
-        if (empty($ifs)) {
+        if (!hasAttribute($node, ATTRIBUTE_IF)) {
             return;
-        };
+        }
 
-        $node->removeAttribute(ATTRIBUTE_IF);
+        $expression = getAttributeValue($node, ATTRIBUTE_IF);
 
-        if (!$scope[$ifs[0]->value]) {
+        if (!$scope[$expression]) {
             $parent = $node->parentNode;
             $parent->removeChild($node);
         }
+
+        $node->removeAttribute(ATTRIBUTE_IF);
+    }
+
+    function processInclude($node, $scope) {
+        if (!hasAttribute($node, ATTRIBUTE_INCLUDE)) {
+            return;
+        }
+
+        $filePath = getAttributeValue($node, ATTRIBUTE_INCLUDE);
+        $node->removeAttribute(ATTRIBUTE_INCLUDE);
+
+        $contents = file_get_contents($filePath);
+
+        $newNode = $node->ownerDocument->createDocumentFragment();
+        $newNode->appendXML($contents);
+        $node->appendChild($newNode);
     }
 
     function processFor($node, $scope) {
-
-        $attributes = getAttributes($node);
-
-        $fors = array_filter($attributes, function($each) {
-            return $each->key == 'tpl-foreach';
-        });
-
-        if (empty($fors)) {
+        if (!hasAttribute($node, ATTRIBUTE_FOR)) {
             return;
-        };
+        }
 
-        $expression = $fors[0]->value;
+        $expression = getAttributeValue($node, ATTRIBUTE_FOR);
 
         $list = $scope[$expression];
 

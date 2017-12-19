@@ -1,17 +1,21 @@
+
 <!doctype html>
 <html>
 <head>
-  <title>{{ $title }}</title>
+    <title>{{ $title }}</title>
 </head>
 <body>
-    <div ng-if="$flag1">
-        is true
-    </div>
-    <div ng-if="$flag2">
-        is false
-    </div>
-    <div ng-for="$list" class="333">
-        {{ $each }}
-    </div>
+<div tpl-if="$flag1">
+    is true
+</div>
+<div tpl-if="$flag2">
+    is false
+</div>
+<div tpl-foreach="$list" class="333">
+    {{ $each }}
+</div>
+
+<div tpl-include="../tpl/fragment.html"></div>
+
 </body>
 </html>

@@ -8,4 +8,4 @@ $data = [
     '$title' => 'Hello',
     '$list' => [1, 2, 3]];
 
-echo render_template('tmpl1.html', $data);
+echo render_template('../tpl/main.html', $data);
