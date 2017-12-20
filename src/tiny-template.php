@@ -2,9 +2,11 @@
 
 namespace {
 
+    require_once('helpers.php');
+
     use tpl\Scope;
 
-    function render_template($templatePath, $data) {
+    function render_template($templatePath, $data = []) {
         $node = new DOMDocument();
         $node->loadHTMLFile($templatePath);
 
@@ -200,15 +202,6 @@ namespace tpl {
         public function __toString() {
             return $this->key . "->" . $this->value;
         }
-    }
-
-    function array_find($array, $predicate) {
-        $list = array_values(array_filter($array, $predicate));
-        if (sizeof($list) > 1) {
-            throw new UnexpectedValueException("found more than one");
-        }
-
-        return sizeof($list) == 0 ? NULL : $list[0];
     }
 
 }
