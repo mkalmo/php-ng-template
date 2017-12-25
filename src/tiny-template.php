@@ -74,7 +74,7 @@ namespace tpl {
 
     function replaceCurlyExpression($text, $scope) {
         return preg_replace_callback(
-            '|{{\s*([$a-z0-9\.]*)\s*}}|im',
+            '|{{\s*([$\w]*)\s*}}|im',
             function ($matches) use ($scope) {
                 return $scope->evaluate($matches[1]);
             },
@@ -172,9 +172,30 @@ namespace tpl {
         }
 
         public function evaluate($expression) {
-            return isset($this->data[$expression])
-                ? $this->data[$expression]
-                : '';
+            $parts = preg_split('/(?=\[)|->/' , $expression);
+            $rootString = array_shift($parts);
+
+            if (!isset($this->data[$rootString])) {
+                return '';
+            }
+
+            $result = $this->data[$rootString];
+
+            foreach ($parts as $part) {
+                if (preg_match('/^\w+$/' , $part)) {
+                    $result = $result->$part;
+                }
+                if (preg_match('/^(\w+)\(\)$/', $part, $matches)) {
+                    $methodName = $matches[1];
+                    $result = $result->$methodName();
+                }
+                if (preg_match('/^\[([^\]]+)\]$/' , $part, $matches)) {
+                    $index = preg_replace('/["\']/', '', $matches[1]);
+                    $result = $result[$index];
+                }
+            }
+
+            return $result;
         }
 
         public function addEntry($key, $value) {
@@ -204,4 +225,13 @@ namespace tpl {
         }
     }
 
+    function array_find($array, $predicate) {
+        $list = array_values(array_filter($array, $predicate));
+        if (sizeof($list) > 1) {
+            throw new UnexpectedValueException("found more than one");
+        }
+
+        return sizeof($list) == 0 ? NULL : $list[0];
+    }
 }
+

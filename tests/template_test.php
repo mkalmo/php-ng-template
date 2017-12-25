@@ -65,57 +65,15 @@ class ParserTests extends UnitTestCase {
         $this->assertPattern('/24/', $this->asText($parent));
     }
 
-    function test_canEvaluateStringExpressions() {
-        $scope = [];
+    function test_scopeCanEvaluateStringExpressions() {
         $customer = new Customer('Jack');
-        $friend = new Customer('Jill');
-        $customer->friend = $friend;
-        $scope['$customer'] = $customer;
-        $scope['$customers'] = [$customer];
+        $jill = new Customer('Jill');
+        $customer->friends []= $jill;
+        $data = ['$customers' => [$customer]];
 
-        $expression = '$customer->friend->getName()';
-        $expression = '$customers[0]->types[1]';
-//        print $customer->name;
-
-        $parts = preg_split('/\s*->\s*/' , $expression);
-
-        $rootString = array_shift($parts);
-
-        if (preg_match('/^(\$\w+)\[(\d+)\]$/' , $rootString, $matches)) {
-            print 'root is array' . PHP_EOL;
-            $name = $matches[1];
-            $index = $matches[2];
-
-            $array = $scope[$name];
-            $root = $array[$index];
-        } else {
-            $root = $scope[$rootString];
-        }
-
-        foreach ($parts as $part) {
-            if (preg_match('/^\w+$/' , $part)) {
-                print $part . ' is property' . PHP_EOL;
-
-                $root = $root->$part;
-            }
-            if (preg_match('/^(\w+)\(\)$/', $part, $matches)) {
-                $methodName = $matches[1];
-
-                print $methodName . ' is method' . PHP_EOL;
-
-                $root = $root->$methodName();
-            }
-            if (preg_match('/^(\w+)\[(\d+)\]$/' , $part, $matches)) {
-                print $part . ' is array' . PHP_EOL;
-                $name = $matches[1];
-                $index = $matches[2];
-                $root = $root->$name[$index];
-            }
-        }
-
-        print_r($root);
-
-        print PHP_EOL;
+        $actual = (new tpl\Scope($data))->evaluate(
+            '$customers[0]->getFriends()["0"]->name');
+        $this->assertEqual('Jill', $actual);
     }
 
     function createNode($source) {
@@ -144,15 +102,14 @@ class ParserTests extends UnitTestCase {
 
 class Customer {
     public $name;
-    public $friend;
-    public $types = ['T1', 'T2'];
+    public $friends = [];
 
     public function __construct($name) {
         $this->name = $name;
     }
 
-    public function getName() {
-        return $this->name;
+    public function getFriends() {
+        return $this->friends;
     }
 }
 
