@@ -28,6 +28,16 @@ class ParserTests extends UnitTestCase {
         $this->assertEqual('hello' . PHP_EOL, $this->asText($doc));
     }
 
+    function test_canProcessBindComplexExpression() {
+        $doc = new DOMDocument('1.0');
+        $node = $doc->createTextNode('{{ $c->name }}');
+        $doc->appendChild($node);
+
+        tpl\processBind($node, new tpl\Scope(['$c' => new Customer('Jack')]));
+
+        $this->assertEqual('Jack' . PHP_EOL, $this->asText($doc));
+    }
+
     function test_canProcessBindExpressionsInAttributes() {
         $node = $this->createNode('<input value="{{ $var }}" />');
 

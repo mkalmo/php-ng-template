@@ -74,7 +74,7 @@ namespace tpl {
 
     function replaceCurlyExpression($text, $scope) {
         return preg_replace_callback(
-            '|{{\s*([$\w]*)\s*}}|im',
+            '|{{\s*(\$[^\s]+)\s*}}|im',
             function ($matches) use ($scope) {
                 return $scope->evaluate($matches[1]);
             },
