@@ -32,20 +32,33 @@ function getNodeByTagName($node, $name) {
     return NULL;
 }
 
-function printStructure($node, $level = 0) {
+function getStructure($node, $level = 0) {
+    $result = '';
 
     $padding = str_repeat ('  ' , $level);
 
-    if (isset($node->nodeName)) {
-        print $node->nodeName;
-    };
-
-    print $padding . get_class($node) . PHP_EOL;
+    $result .= $padding . formatNode($node);
 
     foreach (getChildNodes($node) as $each) {
-        printStructure($each, $level + 1);
+        $result .= getStructure($each, $level + 1);
     }
 
+    return $result;
+}
+
+function formatNode($node) {
+    $result = '';
+    if (isset($node->nodeName)) {
+        $result .= $node->nodeName . ' ';
+    };
+
+    $result .= get_class($node) . ' ';
+
+    if (isset($node->wholeText)) {
+        $result .= $node->wholeText . ' ';
+    };
+
+    return $result . PHP_EOL;
 }
 
 function getAttributes($node) {

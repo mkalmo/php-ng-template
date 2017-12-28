@@ -2,9 +2,13 @@
 
 require_once('../src/helpers.php');
 require_once('./node_helpers.php');
-require_once('../src/tiny-template.php');
+require_once('../src/tpl.php');
 
 class ParserTests extends UnitTestCase {
+
+//    function getTests() {
+//        return ['test_canNegateCondition'];
+//    }
 
     function test_canCheckAttributeExistence() {
         $node = $this->createNode('<div id="1"></div>');
@@ -50,6 +54,14 @@ class ParserTests extends UnitTestCase {
         $node = $this->createNode('<div tpl-if="$flag">1</div>');
 
         tpl\processIf($node, new tpl\Scope(['$flag' => true]));
+
+        $this->assertEqual('<div>1</div>', $this->asText($node));
+    }
+
+    function test_canNegateCondition() {
+        $node = $this->createNode('<div tpl-if="! $flag">1</div>');
+
+        tpl\processIf($node, new tpl\Scope(['$flag' => false]));
 
         $this->assertEqual('<div>1</div>', $this->asText($node));
     }

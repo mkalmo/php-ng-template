@@ -2,8 +2,6 @@
 
 namespace {
 
-    require_once('helpers.php');
-
     use tpl\Scope;
 
     function render_template($templatePath, $data = []) {
@@ -35,22 +33,20 @@ namespace tpl {
             return; // contents is already processed
         }
 
-        if ($node->childNodes) {
-            for ($i = 0; $i < $node->childNodes->length; $i++) {
-                $childNode = $node->childNodes->item($i);
-
-                traverse($childNode, $scope);
-            }
+        foreach (getChildNodes($node) as $childNode) {
+            traverse($childNode, $scope);
         }
     }
 
     function getChildNodes($node) {
         $childNodes = [];
 
-        if ($node->childNodes) {
-            for ($i = 0; $i < $node->childNodes->length; $i++) {
-                $childNodes []= $node->childNodes->item($i);
-            }
+        if (!$node->childNodes) {
+            return [];
+        }
+
+        for ($i = 0; $i < $node->childNodes->length; $i++) {
+            $childNodes []= $node->childNodes->item($i);
         }
 
         return $childNodes;
@@ -122,14 +118,18 @@ namespace tpl {
 
         $parent = $node->parentNode;
 
+        $first = true;
         foreach ($list as $each) {
+            $scope->addEntry('$first', $first);
             $newNode = $node->cloneNode(true);
             $newNode->removeAttribute('tpl-foreach');
             $scope->addEntry('$each', $each);
             traverse($newNode, $scope);
             $scope->removeEntry('$each');
             $parent->insertBefore($newNode, $node);
+            $first = false;
         }
+        $scope->removeEntry('$first');
 
         $parent->removeChild($node);
     }
@@ -175,6 +175,12 @@ namespace tpl {
             $parts = preg_split('/(?=\[)|->/' , $expression);
             $rootString = array_shift($parts);
 
+            $negated = false;
+            if (preg_match('/^!\s*/' , $rootString)) {
+                $rootString = preg_replace('/^!\s*/', '', $rootString);
+                $negated = true;
+            }
+
             if (!isset($this->data[$rootString])) {
                 return '';
             }
@@ -195,7 +201,7 @@ namespace tpl {
                 }
             }
 
-            return $result;
+            return $negated ? !$result : $result;
         }
 
         public function addEntry($key, $value) {
