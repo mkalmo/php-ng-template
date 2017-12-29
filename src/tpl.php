@@ -112,7 +112,11 @@ namespace tpl {
             return;
         }
 
-        $expression = getAttributeValue($node, ATTRIBUTE_FOR);
+        $asExpression = getAttributeValue($node, ATTRIBUTE_FOR);
+
+        $parts = preg_split('/\s+as\s+/', $asExpression);
+        $expression = trim($parts[0]);
+        $variableName = trim($parts[1]);
 
         $list = $scope->evaluate($expression);
 
@@ -120,16 +124,16 @@ namespace tpl {
 
         $first = true;
         foreach ($list as $each) {
-            $scope->addEntry('$first', $first);
             $newNode = $node->cloneNode(true);
-            $newNode->removeAttribute('tpl-foreach');
-            $scope->addEntry('$each', $each);
-            traverse($newNode, $scope);
-            $scope->removeEntry('$each');
+            $newNode->removeAttribute(ATTRIBUTE_FOR);
             $parent->insertBefore($newNode, $node);
+
+            $scope->addLayer(['$first' => $first, $variableName => $each]);
+            traverse($newNode, $scope);
+            $scope->removeLayer();
+
             $first = false;
         }
-        $scope->removeEntry('$first');
 
         $parent->removeChild($node);
     }
@@ -166,9 +170,10 @@ namespace tpl {
 
     class Scope {
         private $data;
+        private $layers = [];
 
         public function __construct($data = []) {
-            $this->data = $data;
+            $this->addLayer($data);
         }
 
         public function evaluate($expression) {
@@ -181,11 +186,11 @@ namespace tpl {
                 $negated = true;
             }
 
-            if (!isset($this->data[$rootString])) {
+            $result = $this->getEntry($rootString);
+
+            if ($result === null) {
                 return '';
             }
-
-            $result = $this->data[$rootString];
 
             foreach ($parts as $part) {
                 if (preg_match('/^\w+$/' , $part)) {
@@ -204,8 +209,33 @@ namespace tpl {
             return $negated ? !$result : $result;
         }
 
+        public function addLayer($data = []) {
+            $this->layers []= $data;
+            $this->data = & $this->layers[sizeof($this->layers) - 1];
+        }
+
+        public function removeLayer() {
+            if (count($this->layers) == 1) {
+                throw new \Exception("can't remove last layer");
+            }
+
+            array_pop($this->layers);
+
+            $this->data = & $this->layers[sizeof($this->layers) - 1];
+        }
+
         public function addEntry($key, $value) {
             $this->data[$key] = $value;
+        }
+
+        public function getEntry($key) {
+            foreach (array_reverse($this->layers) as $layer) {
+                if (isset($layer[$key])) {
+                    return $layer[$key];
+                }
+            }
+
+            return null;
         }
 
         public function removeEntry($key) {
@@ -213,7 +243,7 @@ namespace tpl {
         }
 
         public function __toString() {
-            return '' + print_r($this->data, true);
+            return '' . print_r($this->layers, true);
         }
     }
 

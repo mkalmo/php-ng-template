@@ -77,7 +77,7 @@ class ParserTests extends UnitTestCase {
     }
 
     function test_canProcessForExpression() {
-        $node = $this->createNode('<div tpl-foreach="$list">{{ $each }}</div>');
+        $node = $this->createNode('<div tpl-foreach="$list as $each">{{ $each }}</div>');
 
         $parent = $node->parentNode;
 
@@ -85,6 +85,23 @@ class ParserTests extends UnitTestCase {
 
         $this->assertPattern('/42/', $this->asText($parent));
         $this->assertPattern('/24/', $this->asText($parent));
+    }
+
+    function test_canProcessNestedForLoops() {
+        $node = $this->createNode(
+            '<div tpl-foreach="$list1 as $each">' .
+            '  {{ $each }}' .
+            '  <div tpl-foreach="$list2 as $each">{{ $each }}</div>' .
+            '  {{ $each }}' .
+            '</div>');
+
+        $parent = $node->parentNode;
+
+        tpl\traverse($node, new tpl\Scope(['$list1' => [1], '$list2' => [2]]));
+
+        $this->assertEqual(
+            '<body><div>  1  <div>2</div>  1</div></body>',
+            $this->asText($parent));
     }
 
     function test_scopeCanEvaluateStringExpressions() {
@@ -96,6 +113,27 @@ class ParserTests extends UnitTestCase {
         $actual = (new tpl\Scope($data))->evaluate(
             '$customers[0]->getFriends()["0"]->name');
         $this->assertEqual('Jill', $actual);
+    }
+
+    function test_scopeHasMultipleLayers() {
+        $scope = new tpl\Scope();
+
+        $scope->addEntry('key', 1);
+        $this->assertEqual(1, $scope->getEntry('key'));
+        $scope->addLayer();
+        $this->assertEqual(1, $scope->getEntry('key'));
+        $scope->addEntry('key', 2);
+        $this->assertEqual(2, $scope->getEntry('key'));
+        $scope->removeLayer();
+        $this->assertEqual(1, $scope->getEntry('key'));
+    }
+
+    function test_removingLastScopeLayerThrows() {
+        $scope = new tpl\Scope();
+
+        $this->expectException();
+
+        $scope->removeLayer();
     }
 
     function createNode($source) {
