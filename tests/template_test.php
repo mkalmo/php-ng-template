@@ -87,20 +87,33 @@ class ParserTests extends UnitTestCase {
         $this->assertPattern('/24/', $this->asText($parent));
     }
 
+    function test_forHasFirstAndLastVariables() {
+        $node = $this->createNode(
+            '<b tpl-foreach="$list as $each">{{ $first }}{{ $last }}</b>');
+
+        $parent = $node->parentNode;
+
+        tpl\traverse($node, new tpl\Scope(['$list' => [1, 2, 3]]));
+
+        $this->assertEqual(
+            "<body>\n<b>1</b><b></b><b>1</b>\n</body>",
+            $this->asText($parent));
+    }
+
     function test_canProcessNestedForLoops() {
         $node = $this->createNode(
-            '<div tpl-foreach="$list1 as $each">' .
+            '<b tpl-foreach="$list1 as $each">' .
             '  {{ $each }}' .
-            '  <div tpl-foreach="$list2 as $each">{{ $each }}</div>' .
+            '  <b tpl-foreach="$list2 as $each">{{ $each }}</b>' .
             '  {{ $each }}' .
-            '</div>');
+            '</b>');
 
         $parent = $node->parentNode;
 
         tpl\traverse($node, new tpl\Scope(['$list1' => [1], '$list2' => [2]]));
 
         $this->assertEqual(
-            '<body><div>  1  <div>2</div>  1</div></body>',
+            '<body><b>  1  <b>2</b>  1</b></body>',
             $this->asText($parent));
     }
 
@@ -113,6 +126,12 @@ class ParserTests extends UnitTestCase {
         $actual = (new tpl\Scope($data))->evaluate(
             '$customers[0]->getFriends()["0"]->name');
         $this->assertEqual('Jill', $actual);
+    }
+
+    function test_scopeMissingOffsetReturnsEmptyString() {
+        $actual = (new tpl\Scope(['$list' => []]))->evaluate('$list[0]');
+
+        $this->assertEqual('', $actual);
     }
 
     function test_scopeHasMultipleLayers() {

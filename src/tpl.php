@@ -122,17 +122,21 @@ namespace tpl {
 
         $parent = $node->parentNode;
 
-        $first = true;
+        $index = 0;
         foreach ($list as $each) {
             $newNode = $node->cloneNode(true);
             $newNode->removeAttribute(ATTRIBUTE_FOR);
             $parent->insertBefore($newNode, $node);
 
-            $scope->addLayer(['$first' => $first, $variableName => $each]);
+            $scope->addLayer([
+                '$first' => $index === 0,
+                '$last' => $index === count($list) - 1,
+                $variableName => $each
+            ]);
             traverse($newNode, $scope);
             $scope->removeLayer();
 
-            $first = false;
+            $index++;
         }
 
         $parent->removeChild($node);
@@ -202,7 +206,7 @@ namespace tpl {
                 }
                 if (preg_match('/^\[([^\]]+)\]$/' , $part, $matches)) {
                     $index = preg_replace('/["\']/', '', $matches[1]);
-                    $result = $result[$index];
+                    $result = isset($result[$index]) ? $result[$index] : '';
                 }
             }
 
