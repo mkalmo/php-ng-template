@@ -24,10 +24,10 @@ class ParserTests extends UnitTestCase {
 
     function test_canProcessBindExpression() {
         $doc = new DOMDocument('1.0');
-        $node = $doc->createTextNode('{{ $var }}');
+        $node = $doc->createTextNode('{{ $var1 }}{{ $var2 }}');
         $doc->appendChild($node);
 
-        tpl\processBind($node, new tpl\Scope(['$var' => 'hello']));
+        tpl\processBind($node, new tpl\Scope(['$var1' => 'hello']));
 
         $this->assertEqual('hello' . PHP_EOL, $this->asText($doc));
     }

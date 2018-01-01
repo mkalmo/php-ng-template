@@ -120,6 +120,8 @@ namespace tpl {
 
         $list = $scope->evaluate($expression);
 
+        $list = $list === null ? [] : $list;
+
         $parent = $node->parentNode;
 
         $index = 0;
@@ -193,7 +195,7 @@ namespace tpl {
             $result = $this->getEntry($rootString);
 
             if ($result === null) {
-                return '';
+                return null;
             }
 
             foreach ($parts as $part) {
