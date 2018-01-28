@@ -1,5 +1,7 @@
 <?php
 
+// from: https://bitbucket.org/mkalmo/php-template
+
 namespace {
 
     use tpl\Scope;
@@ -195,7 +197,7 @@ namespace tpl {
             $result = $this->getEntry($rootString);
 
             if ($result === null) {
-                return null;
+                return $negated ? 1 : null;
             }
 
             foreach ($parts as $part) {

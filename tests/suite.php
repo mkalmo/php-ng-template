@@ -1,12 +1,12 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../vendor/simpletest/simpletest/autorun.php');
+require_once(__DIR__ . '/../vendor/simpletest/simpletest/autorun.php');
 
 class AllFileTests extends TestSuite {
     function __construct() {
         parent::__construct();
 
-        $this->collect(dirname(__FILE__) . '/',
+        $this->collect(__DIR__ . '/',
             new SimplePatternCollector('/_test.php/'));
     }
 }
