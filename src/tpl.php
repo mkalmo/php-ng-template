@@ -104,9 +104,21 @@ namespace tpl {
 
         $contents = file_get_contents($filePath);
 
-        $newNode = $node->ownerDocument->createDocumentFragment();
-        $newNode->appendXML($contents);
-        $node->appendChild($newNode);
+//        $newNode = $node->ownerDocument->createDocumentFragment();
+//        $newNode->appendXML($contents);
+//        $node->appendChild($newNode);
+
+        $fragment = new \DOMDocument;
+        $fragment->loadHtml($contents);
+        $body = $fragment->getElementsByTagName("body")->item(0);
+        $children = getChildNodes($body);
+
+//        $doc = getDocument($node);
+
+        foreach ($children as $child) {
+            $imported = $node->ownerDocument->importNode($child, true);
+            $node->appendChild($imported);
+        }
     }
 
     function processFor($node, $scope) {

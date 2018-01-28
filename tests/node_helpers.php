@@ -17,21 +17,6 @@ function getNodeById($root, $id) {
     return NULL;
 }
 
-function getNodeByTagName($node, $name) {
-    if (isset($node->nodeName) && $node->nodeName == $name) {
-        return $node;
-    };
-
-    foreach (getChildNodes($node) as $childNode) {
-        $found = getNodeByTagName($childNode, $name);
-        if ($found) {
-            return $found;
-        }
-    }
-
-    return NULL;
-}
-
 function getStructure($node, $level = 0) {
     $result = '';
 

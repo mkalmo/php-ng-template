@@ -108,24 +108,12 @@ class ParserTests extends ExtendedTestCase {
     private function createNode($source) {
         $doc = new DOMDocument('1.0');
         $doc->loadHTML($source);
-        return getNodeByTagName($doc, 'body')->firstChild;
-    }
-
-    private function getDocument($node) {
-        while (! $node instanceof \DOMDocument) {
-            if (!$node) {
-                throw new RuntimeException("does not have parent of type DOMDocument");
-            }
-
-            $node = $node->parentNode;
-        }
-
-        return $node;
-
+        return $doc->getElementsByTagName('body')->item(0)->firstChild;
     }
 
     private function asText($node) {
-        return $this->getDocument($node)->saveHTML($node);
+        $doc = $node instanceof \DOMDocument ? $node : $node->ownerDocument;
+        return $doc->saveHTML($node);
     }
 }
 
