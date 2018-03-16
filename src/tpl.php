@@ -67,7 +67,7 @@ namespace tpl {
             return;
         }
 
-        $node->nodeValue = replaceCurlyExpression($node->wholeText, $scope);
+        $node->nodeValue = replaceCurlyExpression($node->nodeValue, $scope);
     }
 
     function replaceCurlyExpression($text, $scope) {
