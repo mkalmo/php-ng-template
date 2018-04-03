@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/../vendor/simpletest/simpletest/unit_tester.php');
+
 class ExtendedTestCase extends UnitTestCase {
 
     public function getTests() {

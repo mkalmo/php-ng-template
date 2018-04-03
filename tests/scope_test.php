@@ -3,6 +3,7 @@
 require_once('../src/tpl.php');
 require_once('common.php');
 require_once('node_helpers.php');
+require_once('Customer.class.php');
 
 class ScopeTests extends ExtendedTestCase {
 
@@ -50,3 +51,5 @@ class ScopeTests extends ExtendedTestCase {
         $scope->removeLayer();
     }
 }
+
+(new ScopeTests())->run(new TextReporter());

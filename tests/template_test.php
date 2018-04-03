@@ -3,6 +3,9 @@
 require_once('../src/helpers.php');
 require_once('./node_helpers.php');
 require_once('../src/tpl.php');
+require_once('common.php');
+require_once('Customer.class.php');
+
 
 class ParserTests extends ExtendedTestCase {
 
@@ -117,15 +120,4 @@ class ParserTests extends ExtendedTestCase {
     }
 }
 
-class Customer {
-    public $name;
-    public $friends = [];
-
-    public function __construct($name) {
-        $this->name = $name;
-    }
-
-    public function getFriends() {
-        return $this->friends;
-    }
-}
+(new ParserTests())->run(new TextReporter());
