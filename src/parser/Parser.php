@@ -8,7 +8,7 @@ class Parser {
     public function parse($html) {
         $tokens = (new Lexer())->tokenize($html);
 
-        $root = new Node('');
+        $root = new Node(null);
 
         if (count($tokens) === 0) {
             return $root;
@@ -41,7 +41,7 @@ class Parser {
         if (static::peekNext($tokens) === null) {
             // content was same level stuff
 
-            return array_merge([new Node($current_token->getName())], $contents);
+            return array_merge([new Node($current_token->getWholeTag())], $contents);
         }
 
         $next_token = static::peekNext($tokens);
@@ -52,11 +52,11 @@ class Parser {
 
             array_shift($tokens);
 
-            $node = new Node($current_token->getName());
+            $node = new Node($current_token->getWholeTag());
             $node->addChildren($contents);
             return [$node];
         } else { // other end tag
-            return array_merge([new Node($current_token->getName())], $contents);
+            return array_merge([new Node($current_token->getWholeTag())], $contents);
         }
     }
 

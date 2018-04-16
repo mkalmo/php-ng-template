@@ -15,7 +15,7 @@ class Token {
 }
 
 class Tag extends Token {
-    private $name;
+    protected $name;
 
     public function __construct($name) {
         $this->name = $name;
@@ -27,6 +27,18 @@ class Tag extends Token {
 }
 
 class StartTag extends Tag {
+
+    private $wholeTag;
+
+    public function __construct($name, $wholeTag) {
+        $this->name = $name;
+        $this->wholeTag = $wholeTag;
+    }
+
+    public function getWholeTag() {
+        return $this->wholeTag;
+    }
+
     public function __toString() {
         return sprintf("<%s>\n", $this->getName());
     }
@@ -45,11 +57,11 @@ class TextToken extends Token {
         $this->contents = $contents;
     }
 
-    public function getContents() {
+    public function getWholeTag() {
         return $this->contents;
     }
 
     public function getName() {
-        return 'txt';
+        return '';
     }
 }

@@ -28,8 +28,6 @@ class NewParserTests extends ExtendedTestCase {
 
         print self::toString($node);
 
-//        print_r($node);
-
 //        $this->assertEqual('[hr[], img[], p[]]', self::toString($node));
     }
 
@@ -58,11 +56,11 @@ class NewParserTests extends ExtendedTestCase {
         }
 
         $child_strings = [];
-        foreach ($node->children as $child) {
+        foreach ($node->getChildren() as $child) {
             $child_strings[] = self::toString($child);
         }
 
-        return sprintf('%s[%s]', $node->tag, join(', ', $child_strings));
+        return sprintf('%s[%s]', $node->getTagName(), join(', ', $child_strings));
     }
 
 }

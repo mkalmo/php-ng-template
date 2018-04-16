@@ -15,12 +15,12 @@ class Lexer {
     }
 
     private static function toTag($chunk) {
-        $start_tag_name = '/<(\w+)/';
+        $start_tag = '/<(\w+)[^>\/]*>/';
         $end_tag_name = '/<\/(\w+)/';
 
-        if (preg_match($start_tag_name, $chunk, $matches)) {
-            list ($whole_match, $tag_name) = $matches;
-            return new StartTag($tag_name);
+        if (preg_match($start_tag, $chunk, $matches)) {
+            list ($whole_tag, $tag_name) = $matches;
+            return new StartTag($tag_name, $whole_tag);
         } else if (preg_match($end_tag_name, $chunk, $matches)) {
             list ($whole_match, $tag_name) = $matches;
             return new EndTag($tag_name);
