@@ -4,7 +4,24 @@ require_once('../src/helpers.php');
 require_once('./node_helpers.php');
 require_once('../src/tpl.php');
 
-class ArrayFindTests extends ExtendedTestCase {
+class UtilTests extends ExtendedTestCase {
+
+    function peekingIterator() {
+        $it = new PeekingIterator([1, 2]);
+
+        $this->assertEqual(1, $it->peek());
+
+        $this->assertEqual(1, $it->next());
+
+        $this->assertEqual(2, $it->peek());
+
+        $this->assertTrue($it->hasNext());
+
+        $this->assertEqual(2, $it->next());
+
+        $this->assertFalse($it->hasNext());
+    }
+
 
     function elementExists_returnsIt() {
         $found = array_find([1, 2, 3], function ($element) {

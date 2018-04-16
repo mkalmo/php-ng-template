@@ -10,7 +10,9 @@ class ExtendedTestCase extends UnitTestCase {
         $r = new ReflectionClass($class);
 
         $testMethods = array_filter($r->getMethods(), function ($each) use ($class) {
-            return $each->class === $class && $each->isPublic();
+            return $each->class === $class
+                && $each->isPublic()
+                && !$each->isStatic();
         });
 
         $methodNames = array_map(
