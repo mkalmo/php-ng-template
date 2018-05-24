@@ -1,6 +1,8 @@
 <?php
 
 require_once('../src/tpl.php');
+require_once('../src/Scope.php');
+require_once('../src/Entry.php');
 
 $data = [
     '$flag1' => true,

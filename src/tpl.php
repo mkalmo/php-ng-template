@@ -4,13 +4,21 @@
 
 namespace {
 
+
     use tpl\Scope;
 
     function render_template($templatePath, $data = []) {
+
+        $state = libxml_use_internal_errors(true);
+
         $node = new DOMDocument();
         $node->loadHTMLFile($templatePath);
 
         tpl\traverse($node, new Scope($data));
+
+        var_dump(libxml_get_errors());
+        libxml_clear_errors();
+        libxml_use_internal_errors($state);
 
         return $node->saveHTML();
     }

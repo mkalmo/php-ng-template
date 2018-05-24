@@ -4,12 +4,6 @@ require_once '../src/Scope.php';
 
 class IfNode extends Node {
 
-    private $startTag;
-
-    public function __construct($startTag) {
-        $this->startTag = $startTag;
-    }
-
     public function render($scope) {
         if (!$scope->evaluate($this->getExpression())) {
             return '';

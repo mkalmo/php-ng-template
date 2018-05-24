@@ -12,14 +12,14 @@ class LexerTests extends ExtendedTestCase {
 
         $this->assertEqual(5, count($tokens));
 
-        $expected = ['body', 'p', 'txt', 'p', 'body'];
+        $expected = ['body', 'p', '', 'p', 'body'];
 
         $this->assertEqual($expected, self::getNames($tokens));
     }
 
     static function getNames($tokens) {
         return array_map(function ($each) {
-            return $each->getName();
+            return $each->getTagName();
         }, $tokens);
     }
 

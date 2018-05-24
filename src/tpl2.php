@@ -11,5 +11,7 @@ function render_template($templatePath, $data = []) {
 
     $node = (new Parser())->parse($html);
 
+    var_dump($node);
+
     return $node->render(new Scope($data));
 }

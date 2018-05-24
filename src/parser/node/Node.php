@@ -1,46 +1,33 @@
 <?php
 
 class Node {
-    protected $startTag;
+    protected $token;
 
     private $children = [];
 
-    public function __construct($startTag) {
-        $this->startTag = $startTag;
+    public function __construct($token) {
+        $this->token = $token;
     }
 
     public function render($scope) {
-        if ($this->startTag === null) {
-            $string = '';
-            foreach ($this->children as $child) {
-                $string .= $child->render($scope);
-            }
-            return $string;
-        }
+//        if ($this->token->isRootStartTag()) {
+//        }
 
-        $string = $this->startTag;
+        $string = $this->token->getContents();
 
         foreach ($this->children as $child) {
             $string .= $child->render($scope);
         }
 
-        //return sprintf('</%s>', $this->getTagName());
-
-        var_dump($this);
-
-        return $string;
+        return $string . sprintf('</%s>', $this->token->getTagName());
     }
 
     public function getTagName() {
-        if ($this->startTag === null) {
-            return '';
-        }
+        return $this->token->getTagName();
+    }
 
-        preg_match("/<(\w+)/", $this->startTag, $matches);
-
-        list ($whole_match, $expression) = $matches;
-
-        return $expression;
+    public function getTokenContents() {
+        return $this->token->getContents();
     }
 
     public function getChildren() {

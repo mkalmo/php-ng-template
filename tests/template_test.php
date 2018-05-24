@@ -3,7 +3,9 @@
 require_once('../src/helpers.php');
 require_once('./node_helpers.php');
 require_once('../src/tpl.php');
-require_once('common.php');
+require_once('../src/Scope.php');
+require_once('../src/Entry.php');
+require_once('ExtendedTextCase.php');
 require_once('Customer.class.php');
 
 
