@@ -17,8 +17,7 @@ class ParserTests extends ExtendedTestCase {
 
     function canGetAttributeValue() {
         $node = $this->createNode('<div id="1"></div>');
-        $this->assertEqual('1',
-            tpl\getAttributeValue($node, 'id'));
+        $this->assertEqual('1', tpl\getAttributeValue($node, 'id'));
     }
 
     function canProcessBindExpression() {
@@ -26,25 +25,25 @@ class ParserTests extends ExtendedTestCase {
         $node = $doc->createTextNode('{{ $var1 }}{{ $var2 }}');
         $doc->appendChild($node);
 
-        tpl\processBind($node, new tpl\Scope(['$var1' => 'hello']));
+        tpl\processBind($node, new tpl\Scope(['var1' => 'hello', 'var2' => ' world']));
 
-        $this->assertEqual('hello' . PHP_EOL, $this->asText($doc));
+        $this->assertEqual('hello world' . PHP_EOL, $this->asText($doc));
     }
 
     function canProcessBindComplexExpression() {
         $doc = new DOMDocument('1.0');
-        $node = $doc->createTextNode('{{ $c->name }}');
+        $node = $doc->createTextNode('{{ $c->name }} {{ join(", ", [1, 2, 3]) }}');
         $doc->appendChild($node);
 
-        tpl\processBind($node, new tpl\Scope(['$c' => new Customer('Jack')]));
+        tpl\processBind($node, new tpl\Scope(['c' => new Customer('Jack')]));
 
-        $this->assertEqual('Jack' . PHP_EOL, $this->asText($doc));
+        $this->assertEqual('Jack 1, 2, 3' . PHP_EOL, $this->asText($doc));
     }
 
     function canProcessBindExpressionsInAttributes() {
         $node = $this->createNode('<input value="{{ $var }}" />');
 
-        tpl\processBindOnAttribute($node, new tpl\Scope(['$var' => 'hello']));
+        tpl\processBindOnAttribute($node, new tpl\Scope(['var' => 'hello']));
 
         $this->assertEqual('<input value="hello">', $this->asText($node));
     }
@@ -52,7 +51,7 @@ class ParserTests extends ExtendedTestCase {
     function whenIfConditionIsTrue_contentRemains() {
         $node = $this->createNode('<div tpl-if="$flag">1</div>');
 
-        tpl\processIf($node, new tpl\Scope(['$flag' => true]));
+        tpl\processIf($node, new tpl\Scope(['flag' => true]));
 
         $this->assertEqual('<div>1</div>', $this->asText($node));
     }
@@ -62,17 +61,17 @@ class ParserTests extends ExtendedTestCase {
 
         $parent = $node->parentNode;
 
-        tpl\processIf($node, new tpl\Scope(['$flag' => false]));
+        tpl\processIf($node, new tpl\Scope(['flag' => false]));
 
         $this->assertNoPattern('/42/', $this->asText($parent));
     }
 
     function canProcessForExpression() {
-        $node = $this->createNode('<div tpl-foreach="$list as $each">{{ $each }}</div>');
+        $node = $this->createNode('<p tpl-foreach="$list as $each">{{ $each }}</p>');
 
         $parent = $node->parentNode;
 
-        tpl\processFor($node, new tpl\Scope(['$list' => [42, 24]]));
+        tpl\processFor($node, new tpl\Scope(['list' => [42, 24]]));
 
         $this->assertPattern('/42/', $this->asText($parent));
         $this->assertPattern('/24/', $this->asText($parent));
@@ -84,7 +83,7 @@ class ParserTests extends ExtendedTestCase {
 
         $parent = $node->parentNode;
 
-        tpl\traverse($node, new tpl\Scope(['$list' => [1, 2, 3]]));
+        tpl\traverse($node, new tpl\Scope(['list' => [1, 2, 3]]));
 
         $this->assertEqual(
             "<body>\n<b>1</b><b></b><b>1</b>\n</body>",
@@ -101,7 +100,7 @@ class ParserTests extends ExtendedTestCase {
 
         $parent = $node->parentNode;
 
-        tpl\traverse($node, new tpl\Scope(['$list1' => [1], '$list2' => [2]]));
+        tpl\traverse($node, new tpl\Scope(['list1' => [1], 'list2' => [2]]));
 
         $this->assertEqual(
             '<body><b>  1  <b>2</b>  1</b></body>',
