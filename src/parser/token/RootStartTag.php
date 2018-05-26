@@ -1,6 +1,6 @@
 <?php
 
-class RootStartTag extends Token {
+class RootStartTag extends RegexToken {
 
     public function getTagName() {
         return null;

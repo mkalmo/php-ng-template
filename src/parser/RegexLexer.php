@@ -1,11 +1,11 @@
 <?php
 
-require_once 'token/Token.php';
+require_once 'token/RegexToken.php';
 require_once 'token/StartTag.php';
 require_once 'token/EndTag.php';
-require_once 'token/TextToken.php';
+require_once 'token/TextRegexToken.php';
 
-class Lexer {
+class RegexLexer {
 
     public function tokenize($html) {
         $start_tag = '<[^>\/]+>';
@@ -26,7 +26,7 @@ class Lexer {
         } if (preg_match($end_tag, $chunk)) {
             return new EndTag($chunk);
         } else {
-            return new TextToken($chunk);
+            return new TextRegexToken($chunk);
         }
     }
 }

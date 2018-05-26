@@ -1,6 +1,6 @@
 <?php
 
-require_once 'Lexer.php';
+require_once 'RegexLexer.php';
 require_once 'token/RootStartTag.php';
 require_once 'token/RootEndTag.php';
 require_once 'node/Node.php';
@@ -9,7 +9,7 @@ require_once 'NodeFactory.php';
 class Parser {
 
     public function parse($html) {
-        $tokens = (new Lexer())->tokenize($html);
+        $tokens = (new RegexLexer())->tokenize($html);
 
         array_push($tokens, new RootEndTag());
         array_unshift($tokens, new RootStartTag());

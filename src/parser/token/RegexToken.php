@@ -1,6 +1,6 @@
 <?php
 
-abstract class Token {
+abstract class RegexToken {
 
     protected $contents;
 
@@ -32,7 +32,7 @@ abstract class Token {
     }
 
     public function isTextToken() {
-        return get_class($this) === TextToken::class;
+        return get_class($this) === TextRegexToken::class;
     }
 
     public function isRootStartTag() {

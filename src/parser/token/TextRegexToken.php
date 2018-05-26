@@ -1,6 +1,6 @@
 <?php
 
-class TextToken extends Token {
+class TextRegexToken extends RegexToken {
 
     public function getTagName() {
         return '';

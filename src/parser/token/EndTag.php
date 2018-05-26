@@ -1,6 +1,6 @@
 <?php
 
-class EndTag extends Token {
+class EndTag extends RegexToken {
 
     public function getTagName() {
         $end_tag = '/<\/(\w+)[^>\/]*>/';
