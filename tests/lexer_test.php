@@ -1,28 +1,81 @@
 <?php
 
 require_once('ExtendedTextCase.php');
-require_once('../src/parser/RegexLexer.php');
+require_once('../src/parser/ListLexer.php');
+require_once('../src/parser/HtmlLexer.php');
 
 class LexerTests extends ExtendedTestCase {
 
-    function createsTokensFromHtml() {
-        $html = '<body><p>p1</p></body>';
+    function startTag() {
+        $input = '<img src="index.php" disabled>';
 
-        $tokens = (new RegexLexer())->tokenize($html);
+        $tokens = (new HtmlLexer($input))->tokenize();
 
-        $this->assertEqual(5, count($tokens));
-
-        $expected = ['body', 'p', '', 'p', 'body'];
-
-        $this->assertEqual($expected, self::getNames($tokens));
+        print $this->tokensToString($tokens);
     }
 
-    static function getNames($tokens) {
-        return array_map(function ($each) {
-            return $each->getTagName();
-        }, $tokens);
+    function endTag() {
+        $input = '</p>';
+
+        $tokens = (new HtmlLexer($input))->tokenize();
+
+        print $this->tokensToString($tokens);
     }
 
+    function htmlText() {
+        $input = '"Hello"';
+
+        $tokens = (new HtmlLexer($input))->tokenize();
+
+        print $this->tokensToString($tokens);
+    }
+
+    function htmlComment() {
+        $input = '<!-- c -->';
+
+        $tokens = (new HtmlLexer($input))->tokenize();
+
+        print $this->tokensToString($tokens);
+    }
+
+    function script() {
+        $input = '<script> < </script>';
+
+        $tokens = (new HtmlLexer($input))->tokenize();
+
+        print $this->tokensToString($tokens);
+    }
+
+    function _fromFile() {
+        $input = join('', file('test-data/samples/abc.com.html'));
+
+        $tokens = (new HtmlLexer($input))->tokenize();
+
+        print $this->tokensToString($tokens);
+    }
+
+
+
+    private function tokenTypes($tokens) {
+        $types = [];
+        foreach ($tokens as $token) {
+            $types[] = $token->getType();
+        }
+        return $types;
+    }
+
+    private function tokensToString($tokens) {
+        $types = [];
+        foreach ($tokens as $token) {
+            $types[] = sprintf('%s(%s)', $token->getType(), $token->getText());
+        }
+        return join(', ', $types);
+    }
+
+}
+
+function toString($list) {
+    return join(', ', $list);
 }
 
 (new LexerTests())->run(new TextReporter());
