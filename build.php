@@ -1,15 +1,14 @@
 <?php
 
-$srcRoot = __DIR__ . "/src";
-$buildRoot = __DIR__;
+require_once('src/concat.php');
 
-$phar = new Phar("$buildRoot/tpl.phar",
-    FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME);
+if (!file_exists('dist')) {
+    mkdir('dist');
+}
 
-$phar->buildFromIterator(
-    new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($srcRoot, FilesystemIterator::SKIP_DOTS)
-    ),
-    $srcRoot);
 
-$phar->setStub($phar->createDefaultStub('tiny-template.php'));
+$contents = '// from: https://bitbucket.org/mkalmo/php-template' . PHP_EOL;
+$contents .= '<?php ' . PHP_EOL;
+$contents .= concatenatePhpFiles('src/tpl.php');
+
+file_put_contents('dist/tpl.php', '<?php ' . $contents);

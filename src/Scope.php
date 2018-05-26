@@ -27,7 +27,7 @@ class Scope {
             ${ $key_8slSL29x } = $value_8slSL29x;
         }
 
-        return eval('return ' . $expression_8slSL29x . ';');
+        return @eval('return ' . $expression_8slSL29x . ';');
     }
 
     public function addLayer($data = []) {

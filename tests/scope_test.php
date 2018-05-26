@@ -28,8 +28,20 @@ class ScopeTests extends ExtendedTestCase {
 
     }
 
+    function missingValueIsBlank() {
+        $actual = (new tpl\Scope())->evaluate('$missing');
+
+        $this->assertEqual('', $actual);
+    }
+
     function canNegateCondition() {
         $actual = (new tpl\Scope(['flag' => false]))->evaluate('!$flag');
+
+        $this->assertTrue($actual);
+    }
+
+    function canNegateMissingValue() {
+        $actual = (new tpl\Scope())->evaluate('!$missing');
 
         $this->assertTrue($actual);
     }
