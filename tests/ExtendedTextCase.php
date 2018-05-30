@@ -12,7 +12,8 @@ class ExtendedTestCase extends UnitTestCase {
         $testMethods = array_filter($r->getMethods(), function ($each) use ($class) {
             return $each->class === $class
                 && $each->isPublic()
-                && !$each->isStatic();
+                && !$each->isStatic()
+                && !preg_match('/^x_/', $each->name);
         });
 
         $methodNames = array_map(
@@ -30,4 +31,22 @@ class ExtendedTestCase extends UnitTestCase {
 
         return $methodNames;
     }
+
+    protected function assertListEqual($expectedList, $actualList) {
+        $actualListCopy = $actualList;
+        $pos = 0;
+        foreach ($expectedList as $expectedValue) {
+            $actualValue = array_shift($actualListCopy);
+            if ($expectedValue !== $actualValue) {
+                $this->fail(sprintf('expected: %s actual: %s pos: %s',
+                    $expectedValue, $actualValue, $pos));
+            }
+            $pos++;
+        }
+
+        $this->assertEqual(count($expectedList), count($actualList), 'Different lengths: %s');
+    }
+
+
+
 }

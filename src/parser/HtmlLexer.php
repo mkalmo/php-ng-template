@@ -28,7 +28,7 @@ class HtmlLexer {
 
     public function __construct($input) {
         $this->input = $input;
-        $this->p = 0;
+        $this->p = -1;
         $this->consume();
     }
 
@@ -64,53 +64,17 @@ class HtmlLexer {
     }
 
     private function DTD() {
-        $contents = '';
-        while ($this->c !== '>' && $this->c !== self::EOF_CHAR) {
-            $contents .= $this->c;
-            $this->consume();
-        }
-
-        $this->match('>');
+        $contents = $this->matchBetweenStrings('<!', '>');
         $this->tokens[] = new Token(self::DTD, $contents);
     }
 
     private function HTML_COMMENT() {
-        $contents = '';
-        while (!$this->isMatch('-->') && $this->c !== self::EOF_CHAR) {
-            $contents .= $this->c;
-            $this->consume();
-        }
-
-        if ($this->isMatch('-->')) {
-            $contents .= '-->';
-            $this->match('-');
-            $this->match('-');
-            $this->match('>');
-        }
-
+        $contents = $this->matchBetweenStrings('<!--', '-->');
         $this->tokens[] = new Token(self::HTML_COMMENT, $contents);
     }
 
     private function SCRIPT() {
-        $contents = '';
-        while (!$this->isMatch('</script>') && $this->c !== self::EOF_CHAR) {
-            $contents .= $this->c;
-            $this->consume();
-        }
-
-        if ($this->isMatch('</script>')) {
-            $contents .= '</script>';
-            $this->match('<');
-            $this->match('/');
-            $this->match('s');
-            $this->match('c');
-            $this->match('r');
-            $this->match('i');
-            $this->match('p');
-            $this->match('t');
-            $this->match('>');
-        }
-
+        $contents = $this->matchBetweenStrings('<script', '</script>');
         $this->tokens[] = new Token(self::SCRIPT, $contents);
     }
 
@@ -149,7 +113,7 @@ class HtmlLexer {
         $lineNr = count($lines);
         $colNr = strlen($lines[$lineNr - 1]);
 
-        return sprintf(' at Line: %s, Col: %s', $lineNr, $colNr);
+        return sprintf(' at Line: %s: %s', $lineNr, $colNr);
     }
 
     private function ATTVALUE() {
@@ -160,7 +124,13 @@ class HtmlLexer {
             $this->WS();
         }
 
-        $this->DOUBLE_QUOTE_STRING();
+        if ($this->c === "'") {
+            $this->SINGLE_QUOTE_STRING();
+        } else if ($this->c === '"') {
+            $this->DOUBLE_QUOTE_STRING();
+        } else {
+            throw new Error('unexpected attr value');
+        }
     }
 
     private function TAG_NAME() {
@@ -174,25 +144,21 @@ class HtmlLexer {
         $this->tokens[] = new Token(self::TAG_NAME, $name);
     }
 
+    private function SINGLE_QUOTE_STRING() {
+        $contents = $this->matchBetweenStrings("'", "'");
+        $this->tokens[] = new Token(self::SINGLE_QUOTE_STRING, $contents);
+    }
+
     private function DOUBLE_QUOTE_STRING() {
-        $this->match('"');
-        $contents = '';
-        while ($this->c !== '"') {
-
-            if ($this->c === self::EOF_CHAR) {
-                throw new Error("quoted string started but did not close");
-            }
-
-            $contents .= $this->c;
-            $this->consume();
-        }
-        $this->match('"');
-
+        $contents = $this->matchBetweenStrings('"', '"');
         $this->tokens[] = new Token(self::DOUBLE_QUOTE_STRING, $contents);
     }
 
     private function isWS() {
-        return preg_match('/^\s$/', $this->c);
+        return $this->c === " "
+            || $this->c === "\t"
+            || $this->c === "\r"
+            || $this->c === "\n";
     }
 
     private function WS() {
@@ -201,50 +167,63 @@ class HtmlLexer {
         }
     }
 
-    public function match($x) {
-        if ($this->c === $x) {
-            $this->consume();
-        } else {
-            throw new Error("expecting: " . $x . "; found: " . $this->c . $this->locationString());
+    public function match($stringToMatch) {
+        foreach (str_split($stringToMatch) as $char) {
+            if ($this->c === $char) {
+                $this->consume();
+            } else {
+                throw new Error(sprintf('expecting: %s; found: %s %s',
+                    $char, $this->c, $this->locationString()));
+            }
         }
+
+        return  $stringToMatch;
     }
 
     public function consume() {
-        if ($this->p >= strlen($this->input)) {
-            $this->c = self::EOF_CHAR;
-        } else {
-            $this->c = substr($this->input, $this->p, 1);
-            $this->p++;
-        }
+        $this->p++;
+        $this->c = $this->charFromPos($this->p);
+    }
+
+    private function charFromPos($pos) {
+        return $pos >= strlen($this->input)
+            ? self::EOF_CHAR
+            : substr($this->input, $pos, 1);
+
     }
 
     private function isMatch($stringToMatch) {
-        for ($i = 0; $i < strlen($stringToMatch); $i++) {
+        $p = $this->p;
 
-            $inputCharPos = $this->p - 1 + $i;
+        foreach (str_split($stringToMatch) as $char) {
 
-            if ($inputCharPos >= strlen($this->input)) {
+            if ($char !== $this->charFromPos($p)) {
                 return false;
             }
 
-            $inputChar = substr($this->input, $inputCharPos, 1);
-            $matchChar = substr($stringToMatch, $i, 1);
-
-            if ($inputChar !== $matchChar) {
-                return false;
-            }
+            $p++;
         }
 
         return true;
     }
 
     public function isLETTER() {
-        return preg_match('/^[a-zA-Z]$/', $this->c);
+        return ctype_alpha($this->c);
     }
 
     public function isTAG_NAME_CHAR() {
         return preg_match('/^[-_\.:a-zA-Z0-9]$/', $this->c);
     }
 
+    private function matchBetweenStrings($start, $end) {
+        $contents = $this->match($start);
+
+        while (!$this->isMatch($end) && $this->c !== self::EOF_CHAR) {
+            $contents .= $this->c;
+            $this->consume();
+        }
+
+        return $contents . $this->match($end);
+    }
 }
 
