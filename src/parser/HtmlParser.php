@@ -22,13 +22,11 @@ class HtmlParser {
         // htmlDocument
         //    : SEA_WS? xml? SEA_WS? dtd? SEA_WS? htmlElements*
 
-        var_dump($this->ltt());
+        $this->optionalElement(HtmlLexer::SEA_WS);
+        $this->optionalElement(HtmlLexer::DTD);
+        $this->optionalElement(HtmlLexer::SEA_WS);
 
-        if ($this->ltt() === HtmlLexer::DTD) {
-            $this->consume();
-        }
-
-        while ($this->isHtmlElement()) {
+        while ($this->isHtmlElements()) {
             $this->htmlElements();
         }
     }
@@ -36,17 +34,15 @@ class HtmlParser {
     private function htmlElements() {
         // htmlElements : htmlMisc* htmlElement htmlMisc*
 
-        while ($this->ltt() === HtmlLexer::HTML_COMMENT) {
-            $this->consume();
+        while ($this->isHtmlMisc()) {
+            $this->htmlMisc();
         }
 
         $this->htmlElement();
 
-        while ($this->ltt() === HtmlLexer::HTML_COMMENT) {
-            $this->consume();
+        while ($this->isHtmlMisc()) {
+            $this->htmlMisc();
         }
-
-
     }
 
     private function htmlElement() {
@@ -68,6 +64,16 @@ class HtmlParser {
             $attributes[$key] = $value;
         }
 
+        if ($this->isVoidTag($tagName)) {
+            if ($this->ltt() === HtmlLexer::TAG_SLASH) {
+                $this->consume();
+            }
+
+            $this->match(HtmlLexer::TAG_CLOSE);
+            $this->voidTagAction($tagName, $attributes);
+            return;
+        }
+
         $this->match(HtmlLexer::TAG_CLOSE);
         $this->tagStartAction($tagName, $attributes);
 
@@ -87,8 +93,15 @@ class HtmlParser {
             $this->htmlChardata();
         }
 
-        while ($this->isHtmlElement()) {
-            $this->htmlElement();
+        while ($this->isHtmlElement() || $this->ltt() === HtmlLexer::HTML_COMMENT) {
+
+            if ($this->ltt() === HtmlLexer::HTML_COMMENT) {
+                $this->consume();
+            } else if ($this->isHtmlElement()) {
+                $this->htmlElement();
+            } else {
+                throw new Error();
+            }
 
             if ($this->isHtmlChardata()) {
                 $this->htmlChardata();
@@ -105,6 +118,13 @@ class HtmlParser {
         $this->level++;
     }
 
+    private function voidTagAction($tagName, $attributes) {
+        $padding = str_repeat('  ', $this->level);
+        printf('%s<%s%s/>' . PHP_EOL,
+            $padding, $tagName,
+            $this->attributeString($attributes));
+    }
+
     private function attributeString($attributes) {
         $result = '';
         foreach ($attributes as $key => $value) {
@@ -119,6 +139,11 @@ class HtmlParser {
         $this->level--;
         $padding = str_repeat('  ', $this->level);
         printf('%s</%s>' . PHP_EOL, $padding, $tagName);
+    }
+
+    private function htmlElementAction($token) {
+        $padding = str_repeat('  ', $this->level);
+        printf('%s%s' . PHP_EOL, $padding, $token->type);
     }
 
     private function match($type) {
@@ -140,6 +165,14 @@ class HtmlParser {
 
     private function htmlMisc() {
         // htmlMisc : htmlComment | SEA_WS;
+
+        $this->optionalElement(HtmlLexer::HTML_COMMENT);
+        $this->optionalElement(HtmlLexer::SEA_WS);
+    }
+
+    private function isHtmlMisc() {
+        return $this->ltt() === HtmlLexer::HTML_COMMENT
+            || $this->ltt() === HtmlLexer::SEA_WS;
     }
 
     private function htmlAttribute() {
@@ -152,7 +185,8 @@ class HtmlParser {
         $this->match(HtmlLexer::TAG_NAME);
 
         if ($this->ltt() === HtmlLexer::TAG_EQUALS) {
-            $this->match(HtmlLexer::TAG_EQUALS);
+            $this->consume();
+
             if ($this->ltt() === HtmlLexer::DOUBLE_QUOTE_STRING) {
                 $value = $this->lt()->text;
                 $this->match(HtmlLexer::DOUBLE_QUOTE_STRING);
@@ -173,16 +207,20 @@ class HtmlParser {
     private function htmlChardata() {
         // htmlChardata : HTML_TEXT | SEA_WS;
 
-        $this->match(HtmlLexer::HTML_TEXT);
+        $this->optionalElement(HtmlLexer::SEA_WS);
+        $this->optionalElement(HtmlLexer::HTML_TEXT);
     }
 
     private function isHtmlChardata() {
-        return $this->ltt() === HtmlLexer::HTML_TEXT;
+        return $this->ltt() === HtmlLexer::HTML_TEXT
+            || $this->ltt() === HtmlLexer::SEA_WS;
     }
 
     private function isVoidTag($name) {
-        return $name === 'br'
-            || $name === 'img';
+        $voidTags = 'area base br col embed hr img input'
+                  . 'keygen link meta param source track wbr';
+
+        return in_array($name, explode(' ', $voidTags));
     }
 
     private function isHtmlElement() {
@@ -196,9 +234,14 @@ class HtmlParser {
     }
 
     private function isHtmlElements() {
-        $c = $this->c;
+        return $this->isHtmlMisc() || $this->isHtmlElement();
+    }
 
-        return $c === HtmlLexer::TAG_OPEN;
+    private function optionalElement($tokenType) {
+        if ($this->ltt() === $tokenType) {
+            $this->htmlElementAction($this->lt());
+            $this->consume();
+        }
     }
 
     public function parse() {
