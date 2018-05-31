@@ -76,6 +76,19 @@ class LexerTests extends ExtendedTestCase {
         ], $this->tokenTypes($tokens));
     }
 
+    function seaWs() {
+        $input = ' text';
+
+        $tokens = (new HtmlLexer($input))->tokenize();
+
+        $this->assertListEqual([
+            HtmlLexer::SEA_WS,
+            HtmlLexer::HTML_TEXT,
+            HtmlLexer::EOF_TYPE
+
+        ], $this->tokenTypes($tokens));
+    }
+
     function x_fromFile() {
         $input = join('', file('test-data/samples/abc.com.html'));
 
@@ -95,7 +108,7 @@ class LexerTests extends ExtendedTestCase {
     private function tokenTypes($tokens) {
         $types = [];
         foreach ($tokens as $token) {
-            $types[] = $token->getType();
+            $types[] = $token->type;
         }
         return $types;
     }
@@ -103,7 +116,7 @@ class LexerTests extends ExtendedTestCase {
     private function tokensToString($tokens) {
         $types = [];
         foreach ($tokens as $token) {
-            $types[] = sprintf('%s(%s)', $token->getType(), $token->getText());
+            $types[] = sprintf('%s(%s)', $token->type, $token->text);
         }
         return join(', ', $types);
     }

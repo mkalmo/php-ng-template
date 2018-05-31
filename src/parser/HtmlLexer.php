@@ -18,6 +18,7 @@ class HtmlLexer {
     const TAG_SLASH = 'TAG_SLASH';
     const TAG_EQUALS = 'TAG_EQUALS';
 
+    const SEA_WS = 'SEA_WS';
     const HTML_TEXT = 'HTML_TEXT';
     const HTML_COMMENT = 'HTML_COMMENT';
     const SCRIPT = 'SCRIPT';
@@ -43,6 +44,8 @@ class HtmlLexer {
                 $this->SCRIPT();
             } else if ($this->c === '<') {
                 $this->TAG();
+            }  else if ($this->isWS()) {
+                $this->SEA_WS();
             } else {
                 $this->HTML_TEXT();
             }
@@ -51,6 +54,16 @@ class HtmlLexer {
         $this->tokens[] = new Token(self::EOF_TYPE, '<EOF>');
 
         return $this->tokens;
+    }
+
+    private function SEA_WS() {
+        $contents = '';
+        while ($this->isWS()) {
+            $contents .= $this->c;
+            $this->consume();
+        }
+
+        $this->tokens[] = new Token(self::SEA_WS, $contents);
     }
 
     private function HTML_TEXT() {
