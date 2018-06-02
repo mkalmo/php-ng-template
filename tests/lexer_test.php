@@ -18,8 +18,7 @@ class LexerTests extends ExtendedTestCase {
             HtmlLexer::TAG_EQUALS,
             HtmlLexer::DOUBLE_QUOTE_STRING,
             HtmlLexer::TAG_NAME,
-            HtmlLexer::TAG_CLOSE,
-            HtmlLexer::EOF_TYPE
+            HtmlLexer::TAG_CLOSE
 
         ], $this->tokenTypes($tokens));
     }
@@ -33,8 +32,20 @@ class LexerTests extends ExtendedTestCase {
             HtmlLexer::TAG_OPEN,
             HtmlLexer::TAG_SLASH,
             HtmlLexer::TAG_NAME,
-            HtmlLexer::TAG_CLOSE,
-            HtmlLexer::EOF_TYPE
+            HtmlLexer::TAG_CLOSE
+
+        ], $this->tokenTypes($tokens));
+    }
+
+    function selfCloseTag() {
+        $input = '<br />';
+
+        $tokens = (new HtmlLexer($input))->tokenize();
+
+        $this->assertListEqual([
+            HtmlLexer::TAG_OPEN,
+            HtmlLexer::TAG_NAME,
+            HtmlLexer::TAG_SLASH_CLOSE
 
         ], $this->tokenTypes($tokens));
     }
@@ -45,8 +56,7 @@ class LexerTests extends ExtendedTestCase {
         $tokens = (new HtmlLexer($input))->tokenize();
 
         $this->assertListEqual([
-            HtmlLexer::HTML_TEXT,
-            HtmlLexer::EOF_TYPE
+            HtmlLexer::HTML_TEXT
 
         ], $this->tokenTypes($tokens));
 
@@ -58,8 +68,7 @@ class LexerTests extends ExtendedTestCase {
         $tokens = (new HtmlLexer($input))->tokenize();
 
         $this->assertListEqual([
-            HtmlLexer::HTML_COMMENT,
-            HtmlLexer::EOF_TYPE
+            HtmlLexer::HTML_COMMENT
 
         ], $this->tokenTypes($tokens));
     }
@@ -70,8 +79,7 @@ class LexerTests extends ExtendedTestCase {
         $tokens = (new HtmlLexer($input))->tokenize();
 
         $this->assertListEqual([
-            HtmlLexer::SCRIPT,
-            HtmlLexer::EOF_TYPE
+            HtmlLexer::SCRIPT
 
         ], $this->tokenTypes($tokens));
     }
@@ -83,8 +91,7 @@ class LexerTests extends ExtendedTestCase {
 
         $this->assertListEqual([
             HtmlLexer::SEA_WS,
-            HtmlLexer::HTML_TEXT,
-            HtmlLexer::EOF_TYPE
+            HtmlLexer::HTML_TEXT
 
         ], $this->tokenTypes($tokens));
     }

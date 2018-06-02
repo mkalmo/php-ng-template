@@ -14,6 +14,7 @@ class HtmlLexer {
 
     const TAG_OPEN = 'TAG_OPEN';
     const TAG_CLOSE = 'TAG_CLOSE';
+    const TAG_SLASH_CLOSE = 'TAG_SLASH_CLOSE';
     const TAG_NAME = 'TAG_NAME';
     const TAG_SLASH = 'TAG_SLASH';
     const TAG_EQUALS = 'TAG_EQUALS';
@@ -50,8 +51,6 @@ class HtmlLexer {
                 $this->HTML_TEXT();
             }
         }
-
-        $this->tokens[] = new Token(self::EOF_TYPE, '<EOF>');
 
         return $this->tokens;
     }
@@ -105,6 +104,10 @@ class HtmlLexer {
                 $this->TAG_NAME();
             } else if ($this->c === '=') {
                 $this->ATTVALUE();
+            } else if ($this->isMatch('/>')) {
+                $this->match('/>');
+                $this->tokens[] = new Token(self::TAG_SLASH_CLOSE, '/>');
+                return;
             } else if ($this->c === '/') {
                 $this->consume();
                 $this->tokens[] = new Token(self::TAG_SLASH, '/');

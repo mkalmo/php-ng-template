@@ -8,14 +8,13 @@ class HtmlParser {
     private $p;
     private $level = 0;
     private $input = [];
+    private $actions;
 
-    public function __construct($input) {
-        if (!is_array($input) || end($input)->type !== HtmlLexer::EOF_TYPE) {
-            throw new Error('input does not end with EOF_TYPE token.');
-        }
 
+    public function __construct($input, $actions) {
         $this->input = $input;
-        $this->p = -1;
+        $this->actions = $actions;
+        $this->p = 0;
     }
 
     private function htmlDocument() {
@@ -49,7 +48,7 @@ class HtmlParser {
         // htmlElement : TAG_OPEN .. | script | style;
 
         if ($this->ltt() === HtmlLexer::SCRIPT) {
-            $this->htmlElementAction($this->lt());
+            $this->actions->staticElementAction($this->lt());
             $this->consume();
             return;
         }
@@ -65,17 +64,18 @@ class HtmlParser {
         }
 
         if ($this->isVoidTag($tagName)) {
-            if ($this->ltt() === HtmlLexer::TAG_SLASH) {
+            if ($this->ltt() === HtmlLexer::TAG_SLASH_CLOSE) {
                 $this->consume();
+            } else {
+                $this->match(HtmlLexer::TAG_CLOSE);
             }
 
-            $this->match(HtmlLexer::TAG_CLOSE);
-            $this->voidTagAction($tagName, $attributes);
+            $this->actions->voidTagAction($tagName, $attributes);
             return;
         }
 
         $this->match(HtmlLexer::TAG_CLOSE);
-        $this->tagStartAction($tagName, $attributes);
+        $this->actions->tagStartAction($tagName, $attributes);
 
         $this->htmlContent();
 
@@ -83,7 +83,7 @@ class HtmlParser {
         $this->match(HtmlLexer::TAG_SLASH);
         $this->match(HtmlLexer::TAG_NAME);
         $this->match(HtmlLexer::TAG_CLOSE);
-        $this->tagEndAction($tagName);
+        $this->actions->tagEndAction($tagName);
     }
 
     private function htmlContent() {
@@ -110,20 +110,20 @@ class HtmlParser {
 
     }
 
-    private function tagStartAction($tagName, $attributes) {
-        $padding = str_repeat('  ', $this->level);
-        printf('%s<%s%s>' . PHP_EOL,
-            $padding, $tagName,
-            $this->attributeString($attributes));
-        $this->level++;
-    }
-
-    private function voidTagAction($tagName, $attributes) {
-        $padding = str_repeat('  ', $this->level);
-        printf('%s<%s%s/>' . PHP_EOL,
-            $padding, $tagName,
-            $this->attributeString($attributes));
-    }
+//    private function tagStartAction($tagName, $attributes) {
+//        $padding = str_repeat('  ', $this->level);
+//        printf('%s<%s%s>' . PHP_EOL,
+//            $padding, $tagName,
+//            $this->attributeString($attributes));
+//        $this->level++;
+//    }
+//
+//    private function voidTagAction($tagName, $attributes) {
+//        $padding = str_repeat('  ', $this->level);
+//        printf('%s<%s%s/>' . PHP_EOL,
+//            $padding, $tagName,
+//            $this->attributeString($attributes));
+//    }
 
     private function attributeString($attributes) {
         $result = '';
@@ -135,16 +135,16 @@ class HtmlParser {
         return $result;
     }
 
-    private function tagEndAction($tagName) {
-        $this->level--;
-        $padding = str_repeat('  ', $this->level);
-        printf('%s</%s>' . PHP_EOL, $padding, $tagName);
-    }
-
-    private function htmlElementAction($token) {
-        $padding = str_repeat('  ', $this->level);
-        printf('%s%s' . PHP_EOL, $padding, $token->type);
-    }
+//    private function tagEndAction($tagName) {
+//        $this->level--;
+//        $padding = str_repeat('  ', $this->level);
+//        printf('%s</%s>' . PHP_EOL, $padding, $tagName);
+//    }
+//
+//    private function staticElementAction($token) {
+//        $padding = str_repeat('  ', $this->level);
+//        printf('%s%s' . PHP_EOL, $padding, $token->type);
+//    }
 
     private function match($type) {
         if ($this->ltt() === $type) {
@@ -156,11 +156,15 @@ class HtmlParser {
     }
 
     private function lt($lookahead = 1) {
-        return $this->input[$this->p + $lookahead];
+        $p = $this->p + $lookahead - 1;
+
+        return $p < count($this->input) ? $this->input[$p] : null;
     }
 
     private function ltt($lookahead = 1) {
-        return $this->lt($lookahead)->type;
+        $token = $this->lt($lookahead);
+
+        return $token === null ? 'EOF_TYPE' : $token->type;
     }
 
     private function htmlMisc() {
@@ -239,7 +243,7 @@ class HtmlParser {
 
     private function optionalElement($tokenType) {
         if ($this->ltt() === $tokenType) {
-            $this->htmlElementAction($this->lt());
+            $this->actions->staticElementAction($this->lt());
             $this->consume();
         }
     }

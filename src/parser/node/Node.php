@@ -10,9 +10,6 @@ class Node {
     }
 
     public function render($scope) {
-//        if ($this->token->isRootStartTag()) {
-//        }
-
         $string = $this->token->getContents();
 
         foreach ($this->children as $child) {
@@ -23,7 +20,10 @@ class Node {
     }
 
     public function getTagName() {
-        return $this->token->getTagName();
+        return $this->token;
+
+
+//        return $this->token->getTagName();
     }
 
     public function getTokenContents() {

@@ -13,7 +13,7 @@ class HtmlParserTests extends ExtendedTestCase {
         (new HtmlParser($tokens))->parse();
     }
 
-    function test2() {
+    function _test2() {
         $input = '  <!-- c -->  <img>';
 
         $tokens = (new HtmlLexer($input))->tokenize();
@@ -23,7 +23,7 @@ class HtmlParserTests extends ExtendedTestCase {
         (new HtmlParser($tokens))->parse();
     }
 
-    function _fromFile() {
+    function fromFile() {
         $input = join('', file('test-data/samples/abc.com.html'));
 
         $tokens = (new HtmlLexer($input))->tokenize();
