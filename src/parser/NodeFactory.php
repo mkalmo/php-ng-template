@@ -15,7 +15,7 @@ class NodeFactory {
         if (preg_match("/tpl-if/", $token->getContents())) {
             return new IfNode($token);
         } else {
-            return new Node($token);
+            return new AbstractNode($token);
         }
 
 

@@ -30,7 +30,7 @@ class ReferenceTests extends ExtendedTestCase {
     }
 
     function passObjectByReference() {
-        $node = new Node('b');
+        $node = new AbstractNode('b');
 
         static::modifyObject($node);
 
@@ -38,7 +38,7 @@ class ReferenceTests extends ExtendedTestCase {
     }
 
     static function modifyObject($object) {
-        $object->addChild(new Node('c'));
+        $object->addChild(new AbstractNode('c'));
     }
 
     static function removeFirst(&$array) {

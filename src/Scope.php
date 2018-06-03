@@ -1,7 +1,5 @@
 <?php
 
-namespace tpl;
-
 class Scope {
     private $data;
     private $layers = [];

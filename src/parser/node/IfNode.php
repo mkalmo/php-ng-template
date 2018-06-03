@@ -1,28 +1,23 @@
 <?php
 
-require_once '../src/Scope.php';
+require_once 'TagNode.php';
 
-class IfNode extends Node {
+class IfNode extends TagNode {
 
     public function render($scope) {
         if (!$scope->evaluate($this->getExpression())) {
             return '';
         }
 
-        $this->startTag = $this->removeTplAttributes($this->startTag);
-
         return parent::render($scope);
     }
 
-    private function removeTplAttributes($text) {
-        return preg_replace("/\s+tpl-if\w*=[\"'](.*)[\"']/", '', $text);
-    }
-
     private function getExpression() {
-        preg_match("/tpl-if\w*=[\"'](.*)[\"']/", $this->startTag, $matches);
+        $value = $this->attributes['tpl-if'];
 
-        list ($whole_match, $expression) = $matches;
+        $value = preg_replace("/^['\"]/", '', $value);
+        $value = preg_replace("/['\"]$/", '', $value);
 
-        return $expression;
+        return $value;
     }
 }

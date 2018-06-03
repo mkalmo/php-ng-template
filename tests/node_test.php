@@ -1,18 +1,18 @@
 <?php
 
 require_once('ExtendedTextCase.php');
-require_once('../src/parser/Node.php');
-require_once('../src/parser/TextNode.php');
-require_once('../src/parser/IfNode.php');
+require_once('../src/parser/node/Node.php');
+require_once('../src/parser/node/TextNode.php');
+require_once('../src/parser/node/IfNode.php');
 require_once('../src/Scope.php');
 
 class NodeTests extends ExtendedTestCase {
 
     function removesChildNode() {
-        $parent = new Node('parent');
+        $parent = new AbstractNode('parent');
 
-        $c1 = new Node('c1');
-        $c2 = new Node('c2');
+        $c1 = new AbstractNode('c1');
+        $c2 = new AbstractNode('c2');
 
         $parent->addChild($c1);
         $parent->addChild($c2);
@@ -25,11 +25,11 @@ class NodeTests extends ExtendedTestCase {
     }
 
     function addsNodeBeforeOtherNode() {
-        $parent = new Node('parent');
+        $parent = new AbstractNode('parent');
 
-        $c1 = new Node('c1');
-        $c2 = new Node('c2');
-        $new = new Node('new');
+        $c1 = new AbstractNode('c1');
+        $c2 = new AbstractNode('c2');
+        $new = new AbstractNode('new');
 
         $parent->addChild($c1);
         $parent->addChild($c2);

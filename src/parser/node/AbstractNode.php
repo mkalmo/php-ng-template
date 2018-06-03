@@ -1,23 +1,16 @@
 <?php
 
-class Node {
+abstract class AbstractNode {
+
     protected $token;
 
-    private $children = [];
+    protected $children = [];
 
     public function __construct($token) {
         $this->token = $token;
     }
 
-    public function render($scope) {
-        $string = $this->token->getContents();
-
-        foreach ($this->children as $child) {
-            $string .= $child->render($scope);
-        }
-
-        return $string . sprintf('</%s>', $this->token->getTagName());
-    }
+    public abstract function render($scope);
 
     public function getTagName() {
         return $this->token;

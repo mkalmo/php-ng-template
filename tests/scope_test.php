@@ -1,8 +1,7 @@
 <?php
 
-require_once('../src/tpl.php');
 require_once('ExtendedTextCase.php');
-require_once('node_helpers.php');
+require_once('../src/Scope.php');
 require_once('Customer.class.php');
 
 class ScopeTests extends ExtendedTestCase {
@@ -13,25 +12,25 @@ class ScopeTests extends ExtendedTestCase {
         $customer->friends []= $jill;
         $data = ['$customers' => [$customer]];
 
-        $actual = (new tpl\Scope($data))->evaluate(
+        $actual = (new Scope($data))->evaluate(
             '$customers[0]->getFriends()["0"]->name');
         $this->assertEqual('Jill', $actual);
     }
 
     function missingOffsetReturnsEmptyString() {
-        $actual = (new tpl\Scope(['$list' => []]))->evaluate('$list[0]');
+        $actual = (new Scope(['$list' => []]))->evaluate('$list[0]');
 
         $this->assertEqual('', $actual);
     }
 
     function canNegateCondition() {
-        $actual = (new tpl\Scope(['$flag' => false]))->evaluate('!$flag');
+        $actual = (new Scope(['$flag' => false]))->evaluate('!$flag');
 
         $this->assertTrue($actual);
     }
 
     function hasMultipleLayers() {
-        $scope = new tpl\Scope();
+        $scope = new Scope();
 
         $scope->addEntry('key', 1);
         $this->assertEqual(1, $scope->getEntry('key'));
@@ -44,7 +43,7 @@ class ScopeTests extends ExtendedTestCase {
     }
 
     function removingLastScopeLayerThrows() {
-        $scope = new tpl\Scope();
+        $scope = new Scope();
 
         $this->expectException();
 
@@ -52,4 +51,4 @@ class ScopeTests extends ExtendedTestCase {
     }
 }
 
-(new ScopeTests())->run(new TextReporter());
+//(new ScopeTests())->run(new TextReporter());

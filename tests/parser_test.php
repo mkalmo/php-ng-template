@@ -54,10 +54,10 @@ class NewParserTests extends ExtendedTestCase {
     }
 
     function nodeTreeToString() {
-        $r = new Node('r');
-        $c1 = new Node('c1');
-        $c2 = new Node('c2');
-        $c11= new Node('c11');
+        $r = new AbstractNode('r');
+        $c1 = new AbstractNode('c1');
+        $c2 = new AbstractNode('c2');
+        $c11= new AbstractNode('c11');
 
         $r->addChild($c1);
         $r->addChild($c2);

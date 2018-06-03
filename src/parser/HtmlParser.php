@@ -6,7 +6,6 @@ require_once('HtmlLexer.php');
 class HtmlParser {
 
     private $p;
-    private $level = 0;
     private $input = [];
     private $actions;
 
@@ -64,17 +63,20 @@ class HtmlParser {
         }
 
         if ($this->isVoidTag($tagName)) {
+            $hasSlashClose = false;
             if ($this->ltt() === HtmlLexer::TAG_SLASH_CLOSE) {
+                $hasSlashClose = true;
                 $this->consume();
             } else {
                 $this->match(HtmlLexer::TAG_CLOSE);
             }
 
-            $this->actions->voidTagAction($tagName, $attributes);
+            $this->actions->voidTagAction($tagName, $attributes, $hasSlashClose);
             return;
         }
 
         $this->match(HtmlLexer::TAG_CLOSE);
+
         $this->actions->tagStartAction($tagName, $attributes);
 
         $this->htmlContent();
@@ -107,44 +109,7 @@ class HtmlParser {
                 $this->htmlChardata();
             }
         }
-
     }
-
-//    private function tagStartAction($tagName, $attributes) {
-//        $padding = str_repeat('  ', $this->level);
-//        printf('%s<%s%s>' . PHP_EOL,
-//            $padding, $tagName,
-//            $this->attributeString($attributes));
-//        $this->level++;
-//    }
-//
-//    private function voidTagAction($tagName, $attributes) {
-//        $padding = str_repeat('  ', $this->level);
-//        printf('%s<%s%s/>' . PHP_EOL,
-//            $padding, $tagName,
-//            $this->attributeString($attributes));
-//    }
-
-    private function attributeString($attributes) {
-        $result = '';
-        foreach ($attributes as $key => $value) {
-            $result .= ' ' . $key;
-            $result .= $value !== null ? '=' . $value : '';
-        }
-
-        return $result;
-    }
-
-//    private function tagEndAction($tagName) {
-//        $this->level--;
-//        $padding = str_repeat('  ', $this->level);
-//        printf('%s</%s>' . PHP_EOL, $padding, $tagName);
-//    }
-//
-//    private function staticElementAction($token) {
-//        $padding = str_repeat('  ', $this->level);
-//        printf('%s%s' . PHP_EOL, $padding, $token->type);
-//    }
 
     private function match($type) {
         if ($this->ltt() === $type) {

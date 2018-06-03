@@ -8,20 +8,12 @@ require_once('../src/Entry.php');
 require_once('ExtendedTextCase.php');
 require_once('Customer.class.php');
 
+require_once('../src/parser/HtmlParser.php');
+require_once('../src/parser/HtmlLexer.php');
+require_once('../src/parser/TreeBuilderActions.php');
 
-class ParserTests extends ExtendedTestCase {
 
-    function canCheckAttributeExistence() {
-        $node = $this->createNode('<div id="1"></div>');
-
-        $this->assertTrue(tpl\hasAttribute($node, 'id'));
-    }
-
-    function canGetAttributeValue() {
-        $node = $this->createNode('<div id="1"></div>');
-        $this->assertEqual('1',
-            tpl\getAttributeValue($node, 'id'));
-    }
+class TemplateTests extends ExtendedTestCase {
 
     function canProcessBindExpression() {
         $doc = new DOMDocument('1.0');
@@ -51,33 +43,39 @@ class ParserTests extends ExtendedTestCase {
         $this->assertEqual('<input value="hello">', $this->asText($node));
     }
 
-    function whenIfConditionIsTrue_contentRemains() {
-        $node = $this->createNode('<div tpl-if="$flag">1</div>');
+    function whenIfConditionIsTrue_tagRemains() {
+        $tree = $this->buildTree('<div tpl-if="$flag">1</div>');
 
-        tpl\processIf($node, new tpl\Scope(['$flag' => true]));
+        $scope = new Scope(['$flag' => true]);
 
-        $this->assertEqual('<div>1</div>', $this->asText($node));
+        $this->assertEqual('<div>1</div>', $tree->render($scope));
     }
 
-    function whenIfConditionIsFalse_contentIsRemoved() {
-        $node = $this->createNode('<div tpl-if="$flag">42</div>');
+    function whenIfConditionIsFalse_tagIsRemoved() {
+        $tree = $this->buildTree('<div tpl-if="$flag">1</div>');
 
-        $parent = $node->parentNode;
+        $scope = new Scope(['$flag' => false]);
 
-        tpl\processIf($node, new tpl\Scope(['$flag' => false]));
-
-        $this->assertNoPattern('/42/', $this->asText($parent));
+        $this->assertEqual('', $tree->render($scope));
     }
 
-    function canProcessForExpression() {
-        $node = $this->createNode('<div tpl-foreach="$list as $each">{{ $each }}</div>');
+    function _canProcessForExpression() {
+        $tree = $this->buildTree('<p tpl-foreach="$list as $each">{{ $each }}</p>');
 
-        $parent = $node->parentNode;
+        $scope = new Scope(['$list' => [1, 2]]);
 
-        tpl\processFor($node, new tpl\Scope(['$list' => [42, 24]]));
+        print $tree->render($scope);
 
-        $this->assertPattern('/42/', $this->asText($parent));
-        $this->assertPattern('/24/', $this->asText($parent));
+//        $this->assertEqual('', $tree->render($scope));
+
+//        $node = $this->createNode('<div tpl-foreach="$list as $each">{{ $each }}</div>');
+//
+//        $parent = $node->parentNode;
+//
+//        tpl\processFor($node, new tpl\Scope(['$list' => [42, 24]]));
+//
+//        $this->assertPattern('/42/', $this->asText($parent));
+//        $this->assertPattern('/24/', $this->asText($parent));
     }
 
     function forHasFirstAndLastVariables() {
@@ -120,6 +118,18 @@ class ParserTests extends ExtendedTestCase {
         $doc = $node instanceof \DOMDocument ? $node : $node->ownerDocument;
         return $doc->saveHTML($node);
     }
+
+    private function buildTree($html) {
+        $tokens = (new HtmlLexer($html))->tokenize();
+
+        $builder = new TreeBuilderActions();
+
+        (new HtmlParser($tokens, $builder))->parse();
+
+        return $builder->getResult();
+
+    }
+
 }
 
-(new ParserTests())->run(new TextReporter());
+!debug_backtrace() && (new TemplateTests())->run(new TextReporter());

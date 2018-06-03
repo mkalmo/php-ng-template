@@ -33,4 +33,4 @@ class HtmlParserTests extends ExtendedTestCase {
 
 }
 
-(new HtmlParserTests())->run(new TextReporter());
+(new RenderTests())->run(new TextReporter());

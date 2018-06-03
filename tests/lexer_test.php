@@ -20,7 +20,7 @@ class LexerTests extends ExtendedTestCase {
             HtmlLexer::TAG_NAME,
             HtmlLexer::TAG_CLOSE
 
-        ], $this->tokenTypes($tokens));
+        ], self::tokenTypes($tokens));
     }
 
     function endTag() {
@@ -112,7 +112,7 @@ class LexerTests extends ExtendedTestCase {
 //        print $this->tokensToString($tokens);
     }
 
-    private function tokenTypes($tokens) {
+    private static function tokenTypes($tokens) {
         $types = [];
         foreach ($tokens as $token) {
             $types[] = $token->type;
@@ -130,4 +130,4 @@ class LexerTests extends ExtendedTestCase {
 
 }
 
-(new LexerTests())->run(new TextReporter());
+!debug_backtrace() && (new LexerTests())->run(new TextReporter());

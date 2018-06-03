@@ -1,6 +1,8 @@
 <?php
 
-class TextNode extends AbstractNode {
+require_once '../src/Scope.php';
+
+class MiscNode extends AbstractNode {
 
     private $text;
 
@@ -9,9 +11,7 @@ class TextNode extends AbstractNode {
     }
 
     public function render($scope) {
-        var_dump($scope);
-
-        return $scope->replaceCurlyExpression($this->text);
+        return $this->text;
     }
 
 }

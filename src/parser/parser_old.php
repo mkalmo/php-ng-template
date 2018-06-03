@@ -39,7 +39,7 @@ function build_node($list) {
     $current = array_shift($list);
 
     if (get_class($current) === 'Tag' && !$current->isStart) {
-        $active_start[] = new Node($current-name);
+        $active_start[] = new AbstractNode($current-name);
 
         $child_node = build_node($list);
 
