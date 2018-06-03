@@ -1,22 +1,27 @@
 <!doctype html>
 <html>
 <head>
-    <title>{{ $title }}</title>
+    <title>{{ $title1 }} - {{ $title2 }}</title>
 </head>
 <body>
+
+<div class="{{ $cssClass }}" ></div>
+
 <div tpl-if="$flag1">
-    is true
+    should remain
 </div>
+
 <div tpl-if="$flag2">
-    is false
+    should be removed
 </div>
-<div tpl-foreach="$list as $each" class="333">
+
+<div tpl-foreach="$list1 as $each">
     {{ $each }}
 </div>
 
-<div tpl-include="../tpl/fragment.html"></div>
+<div tpl-include="test-data/tpl/menu.html"></div>
 
-<div tpl-include="{{ $fragment_path }}"></div>
+<div tpl-include="{{ $contentPath }}"></div>
 
 </body>
 </html>

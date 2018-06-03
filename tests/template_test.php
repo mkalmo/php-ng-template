@@ -82,6 +82,26 @@ class TemplateTests extends ExtendedTestCase {
         $this->assertEqual('<p>1<i>2</i><i>3</i>1</p>', $tree->render($scope));
     }
 
+    function _fromFileSmokeTest() {
+        $input = join('', file('test-data/tpl/main.html'));
+
+        $tree = $this->buildTree($input);
+
+        $scope = new Scope([
+            'title1' => 't1',
+            'title2' => 't2',
+            'flag1' => true,
+            'flag2' => false,
+            'cssClass' => 'menu',
+            'list1' => [1, 2],
+            'menuItems' => [1, 2],
+            'contentPath' => 'test-data/tpl/content.html',
+        ]);
+
+        print $tree->render($scope);
+
+    }
+
     private function buildTree($html) {
         $tokens = (new HtmlLexer($html))->tokenize();
 

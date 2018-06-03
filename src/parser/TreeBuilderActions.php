@@ -8,6 +8,7 @@ require_once 'node/MiscNode.php';
 require_once 'node/WsNode.php';
 require_once 'node/IfNode.php';
 require_once 'node/ForNode.php';
+require_once 'node/IncludeNode.php';
 
 class TreeBuilderActions {
 
@@ -33,6 +34,8 @@ class TreeBuilderActions {
             $node = new IfNode($tagName, $attributes);
         } else if (isset($attributes['tpl-foreach'])) {
             $node = new ForNode($tagName, $attributes);
+        } else if (isset($attributes['tpl-include'])) {
+            $node = new IncludeNode($tagName, $attributes);
         } else {
             $node = new TagNode($tagName, $attributes);
         }
