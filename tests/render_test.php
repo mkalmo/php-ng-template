@@ -11,9 +11,7 @@ class RenderTests extends ExtendedTestCase {
 
         $tree = $this->buildTree($input);
 
-        print $tree->render(null) . PHP_EOL;
-
-        $this->assertEqual($input, $tree->render(null));
+        $this->assertEqual($input, $tree->render(new Scope()));
     }
 
     function withWs() {
@@ -21,7 +19,7 @@ class RenderTests extends ExtendedTestCase {
 
         $tree = $this->buildTree($input);
 
-        $this->assertEqual($input, $tree->render(null));
+        $this->assertEqual($input, $tree->render(new Scope()));
     }
 
     function fullRoundTrip() {
@@ -30,7 +28,7 @@ class RenderTests extends ExtendedTestCase {
 
         $tree = $this->buildTree($input);
 
-        $result = $tree->render(null);
+        $result = $tree->render(new Scope());
 
 //        print $result;
 
@@ -45,9 +43,7 @@ class RenderTests extends ExtendedTestCase {
         (new HtmlParser($tokens, $builder))->parse();
 
         return $builder->getResult();
-
     }
-
 }
 
 !debug_backtrace() && (new RenderTests())->run(new TextReporter());

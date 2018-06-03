@@ -9,6 +9,7 @@ class ForNode extends TagNode {
         $parts = preg_split('/\s+as\s+/', $this->getExpression());
         $expression = trim($parts[0]);
         $variableName = trim($parts[1]);
+        $variableName = substr($variableName, 1);
 
         $list = $scope->evaluate($expression);
 
@@ -19,14 +20,14 @@ class ForNode extends TagNode {
         foreach ($list as $each) {
 
             $scope->addLayer([
-                '$first' => $index === 0,
-                '$last' => $index === count($list) - 1,
+                'first' => $index === 0,
+                'last' => $index === count($list) - 1,
                 $variableName => $each
             ]);
 
-            $scope->removeLayer();
-
             $result .= parent::render($scope);
+
+            $scope->removeLayer();
 
             $index++;
         }

@@ -28,7 +28,6 @@ class TreeBuilderActions {
     }
 
     public function tagStartAction($tagName, $attributes) {
-//        var_dump('tag start ' . $tagName);
 
         if (isset($attributes['tpl-if'])) {
             $node = new IfNode($tagName, $attributes);
@@ -44,8 +43,6 @@ class TreeBuilderActions {
     }
 
     public function tagEndAction($tagName) {
-//        var_dump('tag end ' . $tagName);
-
         array_pop($this->stack);
     }
 
@@ -55,6 +52,7 @@ class TreeBuilderActions {
     }
 
     public function staticElementAction($token) {
+
         if ($token->type === HtmlLexer::HTML_TEXT) {
             $node = new TextNode($token->text);
         } else if ($token->type === HtmlLexer::SEA_WS) {

@@ -9,8 +9,6 @@ class TextNode extends AbstractNode {
     }
 
     public function render($scope) {
-        var_dump($scope);
-
         return $scope->replaceCurlyExpression($this->text);
     }
 

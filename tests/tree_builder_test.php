@@ -6,7 +6,19 @@ require_once('../src/parser/TreeBuilderActions.php');
 
 class TreeBuilderTests extends ExtendedTestCase {
 
-    function buildsTree() {
+    function textOutsideTags() {
+        $input = ' a <br> b ';
+
+        $tree = $this->buildNodeTree($input);
+
+        $actual = $this->asString($tree);
+
+        $expected = '[W, T, br[], W, T]';
+
+        $this->assertEqual($expected, $actual);
+    }
+
+    function exampleTree() {
         $input = '<div>
                     <p>hello</p>
                     <p>hello</p>
@@ -16,18 +28,23 @@ class TreeBuilderTests extends ExtendedTestCase {
                     <p>hello</p>
                   </div>  ';
 
+        $tree = $this->buildNodeTree($input);
 
-        $tokens = (new HtmlLexer($input))->tokenize();
+        $actual = $this->asString($tree);
+
+        $expected = '[div[W, p[T], W, p[T], W], W, M, W, div[W, p[T], W], W]';
+
+        $this->assertEqual($expected, $actual);
+    }
+
+    private function buildNodeTree($html) {
+        $tokens = (new HtmlLexer($html))->tokenize();
 
         $builder = new TreeBuilderActions();
 
         (new HtmlParser($tokens, $builder))->parse();
 
-        $actual = $this->asString($builder->getResult());
-
-        $expected = '[div[W, p[T], W, p[T], W], W, M, W, div[W, p[T], W], W]';
-
-        $this->assertEqual($expected, $actual);
+        return $builder->getResult();
     }
 
     private function asString($node) {

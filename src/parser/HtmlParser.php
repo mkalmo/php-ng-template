@@ -9,11 +9,14 @@ class HtmlParser {
     private $input = [];
     private $actions;
 
-
     public function __construct($input, $actions) {
         $this->input = $input;
         $this->actions = $actions;
         $this->p = 0;
+    }
+
+    public function parse() {
+        $this->htmlDocument();
     }
 
     private function htmlDocument() {
@@ -23,10 +26,13 @@ class HtmlParser {
         $this->optionalElement(HtmlLexer::SEA_WS);
         $this->optionalElement(HtmlLexer::DTD);
         $this->optionalElement(HtmlLexer::SEA_WS);
+        $this->optionalElement(HtmlLexer::HTML_TEXT);
 
         while ($this->isHtmlElements()) {
             $this->htmlElements();
         }
+
+        $this->optionalElement(HtmlLexer::HTML_TEXT);
     }
 
     private function htmlElements() {
@@ -186,7 +192,7 @@ class HtmlParser {
     }
 
     private function isVoidTag($name) {
-        $voidTags = 'area base br col embed hr img input'
+        $voidTags = 'area base br col embed hr img input '
                   . 'keygen link meta param source track wbr';
 
         return in_array($name, explode(' ', $voidTags));
@@ -211,10 +217,6 @@ class HtmlParser {
             $this->actions->staticElementAction($this->lt());
             $this->consume();
         }
-    }
-
-    public function parse() {
-        $this->htmlDocument();
     }
 
     public function consume() {

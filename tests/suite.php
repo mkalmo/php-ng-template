@@ -7,7 +7,6 @@ class AllFileTests extends TestSuite {
         parent::__construct();
 
         $this->collect(__DIR__ . '/',
-            new SimplePatternCollector('/(lexer|scope)_test.php/'));
+            new SimplePatternCollector('/_test.php/'));
     }
 }
-

@@ -21,7 +21,7 @@ class VoidTagNode extends TagNode {
 
         $close = $this->hasSlashClose ? '/>' : '>';
 
-        return '<' . $this->name . $this->attributeString() . $close;
+        return '<' . $this->name . $this->attributeString($scope) . $close;
     }
 
     public function getTagName() {

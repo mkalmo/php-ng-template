@@ -21,10 +21,10 @@ class TagNode extends AbstractNode {
         }
 
         return sprintf('<%1$s%2$s>%3$s</%1$s>',
-            $this->name, $this->attributeString(), $contents);
+            $this->name, $this->attributeString($scope), $contents);
     }
 
-    protected function attributeString() {
+    protected function attributeString($scope) {
         $result = '';
         foreach ($this->attributes as $key => $value) {
             if (strpos($key, 'tpl-') === 0) {
@@ -32,7 +32,10 @@ class TagNode extends AbstractNode {
             }
 
             $result .= ' ' . $key;
-            $result .= $value !== null ? '=' . $value : '';
+
+            if ($value !== null) {
+                $result .= '=' . $scope->replaceCurlyExpression($value);
+            }
         }
 
         return $result;

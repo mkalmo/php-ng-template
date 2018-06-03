@@ -1,7 +1,8 @@
 <?php
 
 require_once('ExtendedTextCase.php');
-require_once('../src/Scope.php');
+
+require_once '../src/Scope.php';
 require_once('Customer.class.php');
 
 class ScopeTests extends ExtendedTestCase {
@@ -10,36 +11,52 @@ class ScopeTests extends ExtendedTestCase {
         $customer = new Customer('Jack');
         $jill = new Customer('Jill');
         $customer->friends []= $jill;
-        $data = ['$customers' => [$customer]];
+        $data = ['customers' => [$customer]];
 
         $actual = (new Scope($data))->evaluate(
             '$customers[0]->getFriends()["0"]->name');
         $this->assertEqual('Jill', $actual);
     }
 
-    function missingOffsetReturnsEmptyString() {
-        $actual = (new Scope(['$list' => []]))->evaluate('$list[0]');
+    function canEvaluatePhpFunctions() {
+        $data = ['items' => [1, 2, 3]];
+
+        $actual = (new Scope($data))->evaluate(
+            'join(", ", $items)');
+        $this->assertEqual('1, 2, 3', $actual);
+
+    }
+
+    function missingValueIsBlank() {
+        $actual = (new Scope())->evaluate('$missing');
 
         $this->assertEqual('', $actual);
     }
 
     function canNegateCondition() {
-        $actual = (new Scope(['$flag' => false]))->evaluate('!$flag');
+        $actual = (new Scope(['flag' => false]))->evaluate('!$flag');
+
+        $this->assertTrue($actual);
+    }
+
+    function canNegateMissingValue() {
+        $actual = (new Scope())->evaluate('!$missing');
 
         $this->assertTrue($actual);
     }
 
     function hasMultipleLayers() {
-        $scope = new Scope();
+        $scope = new Scope(['key' => 1]);
+        $this->assertEqual(1, $scope->getEntry('key'));
 
-        $scope->addEntry('key', 1);
-        $this->assertEqual(1, $scope->getEntry('key'));
-        $scope->addLayer();
-        $this->assertEqual(1, $scope->getEntry('key'));
-        $scope->addEntry('key', 2);
-        $this->assertEqual(2, $scope->getEntry('key'));
+        $scope->addLayer([]);
+        $this->assertEqual(1, $scope->getEntry('key')); // visible from previous layer
+
+        $scope->addLayer(['key' => 2]);
+        $this->assertEqual(2, $scope->getEntry('key')); // hidden by 2
+
         $scope->removeLayer();
-        $this->assertEqual(1, $scope->getEntry('key'));
+        $this->assertEqual(1, $scope->getEntry('key')); // visible again
     }
 
     function removingLastScopeLayerThrows() {
@@ -51,4 +68,4 @@ class ScopeTests extends ExtendedTestCase {
     }
 }
 
-//(new ScopeTests())->run(new TextReporter());
+!debug_backtrace() && (new ScopeTests())->run(new TextReporter());
