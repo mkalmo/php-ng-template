@@ -14,3 +14,8 @@ require_once('../src/Entry.php');
 //echo render_template('../tpl/main.html', $data);
 
 //print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,2));
+
+foreach (new DirectoryIterator('test-data/samples') as $fileInfo) {
+    if($fileInfo->isDot()) continue;
+    echo $fileInfo->getPathname() . PHP_EOL;
+}

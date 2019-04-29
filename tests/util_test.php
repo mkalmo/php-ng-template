@@ -1,7 +1,6 @@
 <?php
 
 require_once('../src/helpers.php');
-require_once('./node_helpers.php');
 require_once('../src/tpl.php');
 
 class UtilTests extends ExtendedTestCase {

@@ -27,6 +27,7 @@ class HtmlLexer {
 
     const DOUBLE_QUOTE_STRING = 'DOUBLE_QUOTE_STRING';
     const SINGLE_QUOTE_STRING = 'SINGLE_QUOTE_STRING';
+    const UNQUOTED_STRING = 'UNQUOTED_STRING';
 
     public function __construct($input) {
         $this->input = $input;
@@ -127,9 +128,9 @@ class HtmlLexer {
         $textParsed = substr($this->input, 0, $this->p);
         $lines = explode("\n", $textParsed);
         $lineNr = count($lines);
-        $colNr = strlen($lines[$lineNr - 1]);
+        $colNr = strlen($lines[$lineNr - 1]) + 1;
 
-        return sprintf(' at Line: %s: %s', $lineNr, $colNr);
+        return sprintf(' at %s:%s', $lineNr, $colNr);
     }
 
     private function ATTVALUE() {
@@ -145,7 +146,7 @@ class HtmlLexer {
         } else if ($this->c === '"') {
             $this->DOUBLE_QUOTE_STRING();
         } else {
-            throw new Error('unexpected attr value');
+            $this->UNQUOTED_STRING();
         }
     }
 
@@ -170,6 +171,16 @@ class HtmlLexer {
         $this->tokens[] = new Token(self::DOUBLE_QUOTE_STRING, $contents);
     }
 
+    private function UNQUOTED_STRING() {
+        $contents = '';
+        while (!$this->isWS() && $this->c !== self::EOF_CHAR) {
+            $contents .= $this->c;
+            $this->consume();
+        }
+
+        $this->tokens[] = new Token(self::UNQUOTED_STRING, $contents);
+    }
+
     private function isWS() {
         return $this->c === " "
             || $this->c === "\t"
@@ -179,6 +190,12 @@ class HtmlLexer {
 
     private function WS() {
         while ($this->isWS()) {
+            $this->consume();
+        }
+    }
+
+    private function NON_WS() {
+        while (!$this->isWS()) {
             $this->consume();
         }
     }

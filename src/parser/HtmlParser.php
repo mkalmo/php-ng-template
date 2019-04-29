@@ -2,6 +2,7 @@
 
 require_once 'Token.php';
 require_once('HtmlLexer.php');
+require_once('NopActions.php');
 
 class HtmlParser {
 
@@ -9,9 +10,9 @@ class HtmlParser {
     private $input = [];
     private $actions;
 
-    public function __construct($input, $actions) {
+    public function __construct($input, $actions = null) {
         $this->input = $input;
-        $this->actions = $actions;
+        $this->actions = $actions !== null ? $actions : new NopActions();
         $this->p = 0;
     }
 
@@ -87,10 +88,8 @@ class HtmlParser {
 
         $this->htmlContent();
 
-        $this->match(HtmlLexer::TAG_OPEN);
-        $this->match(HtmlLexer::TAG_SLASH);
-        $this->match(HtmlLexer::TAG_NAME);
-        $this->match(HtmlLexer::TAG_CLOSE);
+        $this->matchCloseOf($tagName);
+
         $this->actions->tagEndAction($tagName);
     }
 
@@ -115,6 +114,25 @@ class HtmlParser {
                 $this->htmlChardata();
             }
         }
+    }
+
+    private function matchCloseOf($tagName) {
+
+        $this->match(HtmlLexer::TAG_OPEN);
+        $this->match(HtmlLexer::TAG_SLASH);
+
+        $actualName = $this->ltt() === HtmlLexer::TAG_NAME
+            ? $actualName = $this->lt()->text
+            : null;
+
+        $this->match(HtmlLexer::TAG_NAME);
+
+        if ($actualName !== $tagName) {
+            throw new Error(sprintf(
+                'unexpected close tag: %s (expecting: %s)', $actualName, $tagName));
+        }
+
+        $this->match(HtmlLexer::TAG_CLOSE);
     }
 
     private function match($type) {
@@ -168,6 +186,9 @@ class HtmlParser {
             } else if ($this->ltt() === HtmlLexer::SINGLE_QUOTE_STRING) {
                 $value = $this->lt()->text;
                 $this->match(HtmlLexer::SINGLE_QUOTE_STRING);
+            } else if ($this->ltt() === HtmlLexer::UNQUOTED_STRING) {
+                $value = $this->lt()->text;
+                $this->match(HtmlLexer::UNQUOTED_STRING);
             } else {
                 throw new Error('unexpected token: ' . $this->ltt());
             }

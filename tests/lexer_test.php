@@ -96,6 +96,23 @@ class LexerTests extends ExtendedTestCase {
         ], $this->tokenTypes($tokens));
     }
 
+    function _unquotedAttributeValue() {
+        $input = '<a src=index.php disabled>';
+
+        $tokens = (new HtmlLexer($input))->tokenize();
+
+        $this->assertListEqual([
+            HtmlLexer::TAG_OPEN,
+            HtmlLexer::TAG_NAME,
+            HtmlLexer::TAG_NAME,
+            HtmlLexer::TAG_EQUALS,
+            HtmlLexer::UQUOTED_STRING,
+            HtmlLexer::TAG_NAME,
+            HtmlLexer::TAG_CLOSE
+
+        ], self::tokenTypes($tokens));
+    }
+
     function x_fromFile() {
         $input = join('', file('test-data/samples/abc.com.html'));
 
