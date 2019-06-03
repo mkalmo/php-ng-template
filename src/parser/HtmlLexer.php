@@ -1,6 +1,7 @@
 <?php
 
 require_once 'Token.php';
+require_once 'LexerException.php';
 
 class HtmlLexer {
 
@@ -98,7 +99,7 @@ class HtmlLexer {
         while ($this->c !== '>') {
 
             if ($this->c === self::EOF_CHAR) {
-                throw new Error("tag started but not closed");
+                $this->throwException("tag started but not closed");
             }
 
             if ($this->isLETTER()) {
@@ -115,22 +116,12 @@ class HtmlLexer {
             } else if ($this->isWS()) {
                 $this->WS();
             } else {
-                throw new Error("invalid character: " .
-                    $this->c . $this->locationString());
+                $this->throwException(sprintf('invalid character: %s', $this->c));
             }
         }
 
         $this->match('>');
         $this->tokens[] = new Token(self::TAG_CLOSE, '>');
-    }
-
-    private function locationString() {
-        $textParsed = substr($this->input, 0, $this->p);
-        $lines = explode("\n", $textParsed);
-        $lineNr = count($lines);
-        $colNr = strlen($lines[$lineNr - 1]) + 1;
-
-        return sprintf(' at %s:%s', $lineNr, $colNr);
     }
 
     private function ATTVALUE() {
@@ -173,7 +164,10 @@ class HtmlLexer {
 
     private function UNQUOTED_STRING() {
         $contents = '';
-        while (!$this->isWS() && $this->c !== self::EOF_CHAR) {
+        while (!$this->isWS()
+            && $this->c !== '>'
+            && $this->c !== self::EOF_CHAR) {
+
             $contents .= $this->c;
             $this->consume();
         }
@@ -194,23 +188,25 @@ class HtmlLexer {
         }
     }
 
-    private function NON_WS() {
-        while (!$this->isWS()) {
-            $this->consume();
-        }
-    }
-
     public function match($stringToMatch) {
         foreach (str_split($stringToMatch) as $char) {
             if ($this->c === $char) {
                 $this->consume();
             } else {
-                throw new Error(sprintf('expecting: %s; found: %s %s',
-                    $char, $this->c, $this->locationString()));
+                $message = sprintf(
+                    'expecting: %s but found: %s', $char, $this->c);
+                $this->throwException($message);
             }
         }
 
         return  $stringToMatch;
+    }
+
+    private function throwException($message) {
+        throw new LexerException(
+            $message,
+            $this->p + 1,
+            $this->c);
     }
 
     public function consume() {

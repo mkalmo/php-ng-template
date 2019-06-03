@@ -15,8 +15,8 @@ class HtmlParserTests extends ExtendedTestCase {
         (new HtmlParser($tokens, new TreeBuilderActions()))->parse();
     }
 
-    function test1() {
-        $input = '<html><p class="c" id="1" disabled>hello</p></html>';
+    function _differentAttributeValues() {
+        $input = '<p class="c" disabled id=1>hello</p>';
 
         $tokens = (new HtmlLexer($input))->tokenize();
 
@@ -31,17 +31,15 @@ class HtmlParserTests extends ExtendedTestCase {
         (new HtmlParser($tokens))->parse();
     }
 
-    function test2() {
-        $input = '  <!-- c -->  <img>';
+    function aaa() {
+        $input = "<a>N 'ignored'<img src='1.gif' class=VideoIconBig> </a>";
 
         $tokens = (new HtmlLexer($input))->tokenize();
-
-//        print_r($tokens);
 
         (new HtmlParser($tokens))->parse();
     }
 
-    function _allFromFile() {
+    function allFromFile() {
         foreach (new DirectoryIterator('test-data/samples') as $fileInfo) {
             if($fileInfo->isDot()) {
                 continue;
@@ -60,8 +58,9 @@ class HtmlParserTests extends ExtendedTestCase {
         }
     }
 
-    function _fromFile() {
-        $path = 'test-data/samples/uglylink.html';
+    function fromFile() {
+        $path = 'test-data/samples/aljazeera.com.html';
+        $path = 'test-data/broken/youtube.html';
 
         print($path . PHP_EOL);
 
@@ -71,7 +70,7 @@ class HtmlParserTests extends ExtendedTestCase {
 
 //        print_r($tokens);
 
-        (new HtmlParser($tokens, new DebugActions()))->parse();
+//        (new HtmlParser($tokens, new DebugActions()))->parse();
     }
 
 

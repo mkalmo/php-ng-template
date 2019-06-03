@@ -7,7 +7,7 @@ require_once('../src/parser/HtmlLexer.php');
 class LexerTests extends ExtendedTestCase {
 
     function startTag() {
-        $input = '<img src="index.php" disabled>';
+        $input = '<img src="index.php" disabled id=1>';
 
         $tokens = (new HtmlLexer($input))->tokenize();
 
@@ -18,6 +18,9 @@ class LexerTests extends ExtendedTestCase {
             HtmlLexer::TAG_EQUALS,
             HtmlLexer::DOUBLE_QUOTE_STRING,
             HtmlLexer::TAG_NAME,
+            HtmlLexer::TAG_NAME,
+            HtmlLexer::TAG_EQUALS,
+            HtmlLexer::UNQUOTED_STRING,
             HtmlLexer::TAG_CLOSE
 
         ], self::tokenTypes($tokens));
@@ -96,23 +99,6 @@ class LexerTests extends ExtendedTestCase {
         ], $this->tokenTypes($tokens));
     }
 
-    function _unquotedAttributeValue() {
-        $input = '<a src=index.php disabled>';
-
-        $tokens = (new HtmlLexer($input))->tokenize();
-
-        $this->assertListEqual([
-            HtmlLexer::TAG_OPEN,
-            HtmlLexer::TAG_NAME,
-            HtmlLexer::TAG_NAME,
-            HtmlLexer::TAG_EQUALS,
-            HtmlLexer::UQUOTED_STRING,
-            HtmlLexer::TAG_NAME,
-            HtmlLexer::TAG_CLOSE
-
-        ], self::tokenTypes($tokens));
-    }
-
     function x_fromFile() {
         $input = join('', file('test-data/samples/abc.com.html'));
 
@@ -127,6 +113,21 @@ class LexerTests extends ExtendedTestCase {
         var_dump($elapsed / 10);  // 0.015
 
 //        print $this->tokensToString($tokens);
+    }
+
+    function invalidSymbol() {
+        $this->expectErrorAt(7, '<img><-');
+    }
+
+    private function expectErrorAt($pos, $input) {
+        try {
+            (new HtmlLexer($input))->tokenize();
+        } catch (LexerException $e) {
+            $this->assertEqual($pos, $e->pos);
+            return;
+        }
+
+        throw new Error("unexpected pass");
     }
 
     private static function tokenTypes($tokens) {
