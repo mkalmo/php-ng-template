@@ -1,7 +1,7 @@
 <?php
 
 require_once 'Token.php';
-require_once 'LexerException.php';
+require_once 'ParseException.php';
 
 class HtmlLexer {
 
@@ -20,11 +20,12 @@ class HtmlLexer {
     const TAG_SLASH = 'TAG_SLASH';
     const TAG_EQUALS = 'TAG_EQUALS';
 
-    const SEA_WS = 'SEA_WS';
+    const WS = 'WS';
     const HTML_TEXT = 'HTML_TEXT';
     const HTML_COMMENT = 'HTML_COMMENT';
     const SCRIPT = 'SCRIPT';
     const DTD = 'DTD';
+    const XML_DECLARATION = 'XML_DECLARATION';
 
     const DOUBLE_QUOTE_STRING = 'DOUBLE_QUOTE_STRING';
     const SINGLE_QUOTE_STRING = 'SINGLE_QUOTE_STRING';
@@ -43,12 +44,14 @@ class HtmlLexer {
                 $this->HTML_COMMENT();
             } else if ($this->isMatch('<!')) {
                 $this->DTD();
+            } else if ($this->isMatch('<?xml')) {
+                $this->XML_DECLARATION();
             } else if ($this->isMatch('<script')) {
                 $this->SCRIPT();
             } else if ($this->c === '<') {
                 $this->TAG();
             }  else if ($this->isWS()) {
-                $this->SEA_WS();
+                $this->WS();
             } else {
                 $this->HTML_TEXT();
             }
@@ -57,14 +60,21 @@ class HtmlLexer {
         return $this->tokens;
     }
 
-    private function SEA_WS() {
+    private function isWS() {
+        return $this->c === " "
+            || $this->c === "\t"
+            || $this->c === "\r"
+            || $this->c === "\n";
+    }
+
+    private function WS() {
         $contents = '';
         while ($this->isWS()) {
             $contents .= $this->c;
             $this->consume();
         }
 
-        $this->tokens[] = new Token(self::SEA_WS, $contents);
+        $this->tokens[] = new Token(self::WS, $contents);
     }
 
     private function HTML_TEXT() {
@@ -79,6 +89,11 @@ class HtmlLexer {
 
     private function DTD() {
         $contents = $this->matchBetweenStrings('<!', '>');
+        $this->tokens[] = new Token(self::DTD, $contents);
+    }
+
+    private function XML_DECLARATION() {
+        $contents = $this->matchBetweenStrings('<?xml', '>');
         $this->tokens[] = new Token(self::DTD, $contents);
     }
 
@@ -175,19 +190,6 @@ class HtmlLexer {
         $this->tokens[] = new Token(self::UNQUOTED_STRING, $contents);
     }
 
-    private function isWS() {
-        return $this->c === " "
-            || $this->c === "\t"
-            || $this->c === "\r"
-            || $this->c === "\n";
-    }
-
-    private function WS() {
-        while ($this->isWS()) {
-            $this->consume();
-        }
-    }
-
     public function match($stringToMatch) {
         foreach (str_split($stringToMatch) as $char) {
             if ($this->c === $char) {
@@ -203,10 +205,9 @@ class HtmlLexer {
     }
 
     private function throwException($message) {
-        throw new LexerException(
+        throw new ParseException(
             $message,
-            $this->p + 1,
-            $this->c);
+            $this->p);
     }
 
     public function consume() {

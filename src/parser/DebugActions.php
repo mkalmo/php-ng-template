@@ -13,18 +13,20 @@ require_once 'node/IncludeNode.php';
 class DebugActions {
 
     public function tagStartAction($tagName, $attributes) {
-        printf('start tag: %s' . PHP_EOL, $tagName);
+        printf('start tag: "%s"' . PHP_EOL, $tagName);
     }
 
     public function tagEndAction($tagName) {
-        printf('end tag: %s' . PHP_EOL, $tagName);
+        printf('end tag: "%s"' . PHP_EOL, $tagName);
     }
 
     public function voidTagAction($tagName, $attributes, $hasSlashClose) {
-        printf('void tag: %s' . PHP_EOL, $tagName);
+        printf('void tag: "%s"' . PHP_EOL, $tagName);
     }
 
     public function staticElementAction($token) {
-        printf('static: %s' . PHP_EOL, $token->text);
+        throw new Error();
+
+        printf('static: "%s"' . PHP_EOL, $token->text);
     }
 }

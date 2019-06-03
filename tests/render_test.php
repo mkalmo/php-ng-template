@@ -3,10 +3,21 @@
 require_once('ExtendedTextCase.php');
 require_once('../src/parser/HtmlParser.php');
 require_once('../src/parser/TreeBuilderActions.php');
+require_once('../src/parser/DebugActions.php');
 
 class RenderTests extends ExtendedTestCase {
 
     function _simple() {
+        $input = '<input />';
+
+        $tree = $this->buildTree($input);
+
+//        print_r($tree);
+
+        $this->assertEqual($input, $tree->render(new Scope()));
+    }
+
+    function _simple1() {
         $input = '<div id="1">text<br><br/></div>';
 
         $tree = $this->buildTree($input);
@@ -38,7 +49,10 @@ class RenderTests extends ExtendedTestCase {
     private function buildTree($html) {
         $tokens = (new HtmlLexer($html))->tokenize();
 
+        print_r($tokens);
+
         $builder = new TreeBuilderActions();
+        $builder = new DebugActions();
 
         (new HtmlParser($tokens, $builder))->parse();
 

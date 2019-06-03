@@ -3,12 +3,14 @@
 require_once 'Token.php';
 require_once('HtmlLexer.php');
 require_once('NopActions.php');
+require_once('ParseException.php');
 
 class HtmlParser {
 
     private $p;
     private $input = [];
     private $actions;
+    private $consumedPos = 0;
 
     public function __construct($input, $actions = null) {
         $this->input = $input;
@@ -24,9 +26,9 @@ class HtmlParser {
         // htmlDocument
         //    : SEA_WS? xml? SEA_WS? dtd? SEA_WS? htmlElements*
 
-        $this->optionalElement(HtmlLexer::SEA_WS);
+        $this->optionalElement(HtmlLexer::WS);
         $this->optionalElement(HtmlLexer::DTD);
-        $this->optionalElement(HtmlLexer::SEA_WS);
+        $this->optionalElement(HtmlLexer::WS);
         $this->optionalElement(HtmlLexer::HTML_TEXT);
 
         while ($this->isHtmlElements()) {
@@ -62,6 +64,8 @@ class HtmlParser {
         $this->match(HtmlLexer::TAG_OPEN);
         $tagName = $this->lt()->text;
         $this->match(HtmlLexer::TAG_NAME);
+
+        $this->optionalElement(HtmlLexer::WS);
 
         $attributes = [];
         while ($this->ltt() === HtmlLexer::TAG_NAME) {
@@ -107,7 +111,9 @@ class HtmlParser {
             } else if ($this->isHtmlElement()) {
                 $this->htmlElement();
             } else {
-                throw new Error();
+                return new ParseException(
+                    'unknown token type: ' . $this->ltt(),
+                    $this->consumedPos);
             }
 
             if ($this->isHtmlChardata()) {
@@ -128,8 +134,11 @@ class HtmlParser {
         $this->match(HtmlLexer::TAG_NAME);
 
         if ($actualName !== $tagName) {
-            throw new Error(sprintf(
-                'unexpected close tag: %s (expecting: %s)', $actualName, $tagName));
+            $message = sprintf(
+                'unexpected close tag: %s (expecting: %s)', $actualName, $tagName);
+
+            throw new ParseException($message,
+                ($this->consumedPos - strlen($actualName)));
         }
 
         $this->match(HtmlLexer::TAG_CLOSE);
@@ -139,8 +148,10 @@ class HtmlParser {
         if ($this->ltt() === $type) {
             $this->consume();
         } else {
-            throw new Error(sprintf(
-                'expected: %s found: %s', $type, $this->ltt()));
+            $message = sprintf(
+                'expected: %s found: %s', $type, $this->ltt());
+
+            throw new ParseException($message, $this->consumedPos);
         }
     }
 
@@ -157,15 +168,15 @@ class HtmlParser {
     }
 
     private function htmlMisc() {
-        // htmlMisc : htmlComment | SEA_WS;
+        // htmlMisc : htmlComment | WS;
 
         $this->optionalElement(HtmlLexer::HTML_COMMENT);
-        $this->optionalElement(HtmlLexer::SEA_WS);
+        $this->optionalElement(HtmlLexer::WS);
     }
 
     private function isHtmlMisc() {
         return $this->ltt() === HtmlLexer::HTML_COMMENT
-            || $this->ltt() === HtmlLexer::SEA_WS;
+            || $this->ltt() === HtmlLexer::WS;
     }
 
     private function htmlAttribute() {
@@ -175,10 +186,16 @@ class HtmlParser {
         //    ;
 
         $key = $this->lt()->text;
+        $value = null;
+
         $this->match(HtmlLexer::TAG_NAME);
+
+        $this->optionalElement(HtmlLexer::WS);
 
         if ($this->ltt() === HtmlLexer::TAG_EQUALS) {
             $this->consume();
+
+            $this->optionalElement(HtmlLexer::WS);
 
             if ($this->ltt() === HtmlLexer::DOUBLE_QUOTE_STRING) {
                 $value = $this->lt()->text;
@@ -190,26 +207,27 @@ class HtmlParser {
                 $value = $this->lt()->text;
                 $this->match(HtmlLexer::UNQUOTED_STRING);
             } else {
-                throw new Error('unexpected token: ' . $this->ltt());
+                throw new ParseException(
+                    'unexpected token: ' . $this->ltt(),
+                    $this->consumedPos);
             }
-
-            return [$key, $value];
-
-        } else {
-            return [$key, null];
         }
+
+        $this->optionalElement(HtmlLexer::WS);
+
+        return [$key, $value];
     }
 
     private function htmlChardata() {
-        // htmlChardata : HTML_TEXT | SEA_WS;
+        // htmlChardata : HTML_TEXT | WS;
 
-        $this->optionalElement(HtmlLexer::SEA_WS);
+        $this->optionalElement(HtmlLexer::WS);
         $this->optionalElement(HtmlLexer::HTML_TEXT);
     }
 
     private function isHtmlChardata() {
         return $this->ltt() === HtmlLexer::HTML_TEXT
-            || $this->ltt() === HtmlLexer::SEA_WS;
+            || $this->ltt() === HtmlLexer::WS;
     }
 
     private function isVoidTag($name) {
@@ -241,8 +259,10 @@ class HtmlParser {
     }
 
     public function consume() {
+//        printf('%s' . PHP_EOL, $this->ltt());
+
+        $this->consumedPos += strlen($this->lt()->text);
         $this->p++;
     }
-
 }
 

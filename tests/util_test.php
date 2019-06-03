@@ -2,6 +2,7 @@
 
 require_once('../src/helpers.php');
 require_once('../src/tpl.php');
+require_once('ExtendedTextCase.php');
 
 class UtilTests extends ExtendedTestCase {
 

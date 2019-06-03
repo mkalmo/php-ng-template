@@ -7,20 +7,26 @@ require_once('../src/parser/HtmlLexer.php');
 class LexerTests extends ExtendedTestCase {
 
     function startTag() {
-        $input = '<img src="index.php" disabled id=1>';
+        $input = '<img src="index.php" disabled id = 1 >';
 
         $tokens = (new HtmlLexer($input))->tokenize();
 
         $this->assertListEqual([
             HtmlLexer::TAG_OPEN,
             HtmlLexer::TAG_NAME,
+            HtmlLexer::WS,
             HtmlLexer::TAG_NAME,
             HtmlLexer::TAG_EQUALS,
             HtmlLexer::DOUBLE_QUOTE_STRING,
+            HtmlLexer::WS,
             HtmlLexer::TAG_NAME,
+            HtmlLexer::WS,
             HtmlLexer::TAG_NAME,
+            HtmlLexer::WS,
             HtmlLexer::TAG_EQUALS,
+            HtmlLexer::WS,
             HtmlLexer::UNQUOTED_STRING,
+            HtmlLexer::WS,
             HtmlLexer::TAG_CLOSE
 
         ], self::tokenTypes($tokens));
@@ -48,6 +54,7 @@ class LexerTests extends ExtendedTestCase {
         $this->assertListEqual([
             HtmlLexer::TAG_OPEN,
             HtmlLexer::TAG_NAME,
+            HtmlLexer::WS,
             HtmlLexer::TAG_SLASH_CLOSE
 
         ], $this->tokenTypes($tokens));
@@ -93,36 +100,20 @@ class LexerTests extends ExtendedTestCase {
         $tokens = (new HtmlLexer($input))->tokenize();
 
         $this->assertListEqual([
-            HtmlLexer::SEA_WS,
+            HtmlLexer::WS,
             HtmlLexer::HTML_TEXT
 
         ], $this->tokenTypes($tokens));
     }
 
-    function x_fromFile() {
-        $input = join('', file('test-data/samples/abc.com.html'));
-
-        $start = microtime(true);
-
-        for ($i = 0; $i < 10; $i++) {
-            $tokens = (new HtmlLexer($input))->tokenize();
-        }
-
-        $elapsed = microtime(true) - $start;
-
-        var_dump($elapsed / 10);  // 0.015
-
-//        print $this->tokensToString($tokens);
-    }
-
     function invalidSymbol() {
-        $this->expectErrorAt(7, '<img><-');
+        $this->expectErrorAt(6, '<img><-');
     }
 
     private function expectErrorAt($pos, $input) {
         try {
             (new HtmlLexer($input))->tokenize();
-        } catch (LexerException $e) {
+        } catch (ParseException $e) {
             $this->assertEqual($pos, $e->pos);
             return;
         }

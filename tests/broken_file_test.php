@@ -5,7 +5,7 @@ require_once('../src/parser/FileParser.php');
 
 class BrokenFileTests extends ExtendedTestCase {
 
-    function _allFromFile() {
+    function x_allFromFile() {
         foreach (new DirectoryIterator('test-data/samples') as $fileInfo) {
             if($fileInfo->isDot()) {
                 continue;
@@ -19,8 +19,8 @@ class BrokenFileTests extends ExtendedTestCase {
         }
     }
 
-    function fromFile() {
-        $path = 'test-data/simple/a.html';
+    function x_fromFile() {
+        $path = 'test-data/simple/d.html';
 
         (new FileParser($path))->parse();
     }

@@ -15,34 +15,34 @@ class FileParser {
     }
 
     public function parse() {
-        $tokens = [];
         try {
             $tokens = (new HtmlLexer($this->input))->tokenize();
-        } catch (LexerException $e) {
-            $this->throwLexerError($e);
+
+            $builder = new TreeBuilderActions();
+
+            (new HtmlParser($tokens, $builder))->parse();
+
+        } catch (ParseException $e) {
+            throw $this->error($e);
         }
-
-        $builder = new TreeBuilderActions();
-
-        (new HtmlParser($tokens, $builder))->parse();
 
         return $builder->getResult();
     }
 
-    private function throwLexerError($e) {
+    private function error($e) {
         $message = printf("%s \nat %s:%s\n",
             $e->message,
             realpath($this->filePath),
-            $this->locationString($e));
+            $this->locationString($e->pos));
 
-        throw new Error($message);
+        return new Error($message);
     }
 
-    private function locationString($e) {
-        $textParsed = substr($this->input, 0, $e->pos);
+    private function locationString($pos) {
+        $textParsed = substr($this->input, 0, $pos);
         $lines = explode("\n", $textParsed);
         $lineNr = count($lines);
-        $colNr = strlen($lines[$lineNr - 1]);
+        $colNr = strlen($lines[$lineNr - 1]) + 1; // +1: starts from 1
 
         return sprintf('%s:%s', $lineNr, $colNr);
     }
