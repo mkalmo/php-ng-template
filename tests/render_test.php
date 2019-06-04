@@ -7,17 +7,7 @@ require_once('../src/parser/DebugActions.php');
 
 class RenderTests extends ExtendedTestCase {
 
-    function _simple() {
-        $input = '<input />';
-
-        $tree = $this->buildTree($input);
-
-//        print_r($tree);
-
-        $this->assertEqual($input, $tree->render(new Scope()));
-    }
-
-    function _simple1() {
+    function simple() {
         $input = '<div id="1">text<br><br/></div>';
 
         $tree = $this->buildTree($input);
@@ -33,26 +23,10 @@ class RenderTests extends ExtendedTestCase {
         $this->assertEqual($input, $tree->render(new Scope()));
     }
 
-    function fullRoundTrip() {
-        $input = join('', file('test-data/tpl/fragment.html'));
-        $input = join('', file('test-data/samples/abc.com.html'));
-
-        $tree = $this->buildTree($input);
-
-        $result = $tree->render(new Scope());
-
-//        print $result;
-
-        $this->assertEqual($input, $result);
-    }
-
     private function buildTree($html) {
         $tokens = (new HtmlLexer($html))->tokenize();
 
-        print_r($tokens);
-
         $builder = new TreeBuilderActions();
-        $builder = new DebugActions();
 
         (new HtmlParser($tokens, $builder))->parse();
 

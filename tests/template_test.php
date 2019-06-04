@@ -82,8 +82,8 @@ class TemplateTests extends ExtendedTestCase {
         $this->assertEqual('<p>1<i>2</i><i>3</i>1</p>', $tree->render($scope));
     }
 
-    function _fromFileSmokeTest() {
-        $input = join('', file('test-data/tpl/main.html'));
+    function fromFileSmokeTest() {
+        $input = file_get_contents('test-data/tpl/main.html');
 
         $tree = $this->buildTree($input);
 
@@ -98,8 +98,7 @@ class TemplateTests extends ExtendedTestCase {
             'contentPath' => 'test-data/tpl/content.html',
         ]);
 
-        print $tree->render($scope);
-
+        $tree->render($scope);
     }
 
     private function buildTree($html) {

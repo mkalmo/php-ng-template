@@ -11,7 +11,7 @@ class FileParser {
 
     public function __construct($filePath) {
         $this->filePath = $filePath;
-        $this->input = join('', file($this->filePath));;
+        $this->input = file_get_contents($this->filePath);
     }
 
     public function parse() {

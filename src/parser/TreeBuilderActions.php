@@ -58,7 +58,7 @@ class TreeBuilderActions {
 
         if ($token->type === HtmlLexer::HTML_TEXT) {
             $node = new TextNode($token->text);
-        } else if ($token->type === HtmlLexer::WS) {
+        } else if ($token->type === HtmlLexer::SEA_WS) {
             $node = new WsNode($token->text);
         } else {
             $node = new MiscNode($token->text);

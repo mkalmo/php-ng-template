@@ -26,9 +26,10 @@ class HtmlParser {
         // htmlDocument
         //    : SEA_WS? xml? SEA_WS? dtd? SEA_WS? htmlElements*
 
-        $this->optionalElement(HtmlLexer::WS);
+        $this->optionalElement(HtmlLexer::SEA_WS);
         $this->optionalElement(HtmlLexer::DTD);
-        $this->optionalElement(HtmlLexer::WS);
+        $this->optionalElement(HtmlLexer::XML_DECLARATION);
+        $this->optionalElement(HtmlLexer::SEA_WS);
         $this->optionalElement(HtmlLexer::HTML_TEXT);
 
         while ($this->isHtmlElements()) {
@@ -65,7 +66,7 @@ class HtmlParser {
         $tagName = $this->lt()->text;
         $this->match(HtmlLexer::TAG_NAME);
 
-        $this->optionalElement(HtmlLexer::WS);
+        $this->optionalTagSpace();
 
         $attributes = [];
         while ($this->ltt() === HtmlLexer::TAG_NAME) {
@@ -171,12 +172,12 @@ class HtmlParser {
         // htmlMisc : htmlComment | WS;
 
         $this->optionalElement(HtmlLexer::HTML_COMMENT);
-        $this->optionalElement(HtmlLexer::WS);
+        $this->optionalElement(HtmlLexer::SEA_WS);
     }
 
     private function isHtmlMisc() {
         return $this->ltt() === HtmlLexer::HTML_COMMENT
-            || $this->ltt() === HtmlLexer::WS;
+            || $this->ltt() === HtmlLexer::SEA_WS;
     }
 
     private function htmlAttribute() {
@@ -190,12 +191,12 @@ class HtmlParser {
 
         $this->match(HtmlLexer::TAG_NAME);
 
-        $this->optionalElement(HtmlLexer::WS);
+        $this->optionalTagSpace();
 
         if ($this->ltt() === HtmlLexer::TAG_EQUALS) {
             $this->consume();
 
-            $this->optionalElement(HtmlLexer::WS);
+            $this->optionalTagSpace();
 
             if ($this->ltt() === HtmlLexer::DOUBLE_QUOTE_STRING) {
                 $value = $this->lt()->text;
@@ -213,7 +214,7 @@ class HtmlParser {
             }
         }
 
-        $this->optionalElement(HtmlLexer::WS);
+        $this->optionalTagSpace();
 
         return [$key, $value];
     }
@@ -221,13 +222,13 @@ class HtmlParser {
     private function htmlChardata() {
         // htmlChardata : HTML_TEXT | WS;
 
-        $this->optionalElement(HtmlLexer::WS);
+        $this->optionalElement(HtmlLexer::SEA_WS);
         $this->optionalElement(HtmlLexer::HTML_TEXT);
     }
 
     private function isHtmlChardata() {
         return $this->ltt() === HtmlLexer::HTML_TEXT
-            || $this->ltt() === HtmlLexer::WS;
+            || $this->ltt() === HtmlLexer::SEA_WS;
     }
 
     private function isVoidTag($name) {
@@ -254,6 +255,12 @@ class HtmlParser {
     private function optionalElement($tokenType) {
         if ($this->ltt() === $tokenType) {
             $this->actions->staticElementAction($this->lt());
+            $this->consume();
+        }
+    }
+
+    private function optionalTagSpace() {
+        if ($this->ltt() === HtmlLexer::TAG_WS) {
             $this->consume();
         }
     }

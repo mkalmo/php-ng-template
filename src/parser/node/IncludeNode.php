@@ -5,11 +5,11 @@ require_once 'TagNode.php';
 class IncludeNode extends TagNode {
 
     public function render($scope) {
-        $value = $scope->replaceCurlyExpression($this->getExpression());
+        $path = $scope->replaceCurlyExpression($this->getExpression());
 
-        $value = $this->removeQuotes($value);
+        $path = $this->removeQuotes($path);
 
-        $html = join('', file($value));
+        $html = file_get_contents($path);
 
         $tree = $this->buildTree($html);
 

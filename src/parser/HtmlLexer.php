@@ -20,7 +20,8 @@ class HtmlLexer {
     const TAG_SLASH = 'TAG_SLASH';
     const TAG_EQUALS = 'TAG_EQUALS';
 
-    const WS = 'WS';
+    const SEA_WS = 'SEA_WS';
+    const TAG_WS = 'TAG_WS';
     const HTML_TEXT = 'HTML_TEXT';
     const HTML_COMMENT = 'HTML_COMMENT';
     const SCRIPT = 'SCRIPT';
@@ -51,7 +52,7 @@ class HtmlLexer {
             } else if ($this->c === '<') {
                 $this->TAG();
             }  else if ($this->isWS()) {
-                $this->WS();
+                $this->WS(self::SEA_WS);
             } else {
                 $this->HTML_TEXT();
             }
@@ -67,14 +68,14 @@ class HtmlLexer {
             || $this->c === "\n";
     }
 
-    private function WS() {
+    private function WS($wsType) {
         $contents = '';
         while ($this->isWS()) {
             $contents .= $this->c;
             $this->consume();
         }
 
-        $this->tokens[] = new Token(self::WS, $contents);
+        $this->tokens[] = new Token($wsType, $contents);
     }
 
     private function HTML_TEXT() {
@@ -94,7 +95,7 @@ class HtmlLexer {
 
     private function XML_DECLARATION() {
         $contents = $this->matchBetweenStrings('<?xml', '>');
-        $this->tokens[] = new Token(self::DTD, $contents);
+        $this->tokens[] = new Token(self::XML_DECLARATION, $contents);
     }
 
     private function HTML_COMMENT() {
@@ -129,7 +130,7 @@ class HtmlLexer {
                 $this->consume();
                 $this->tokens[] = new Token(self::TAG_SLASH, '/');
             } else if ($this->isWS()) {
-                $this->WS();
+                $this->WS(self::TAG_WS);
             } else {
                 $this->throwException(sprintf('invalid character: %s', $this->c));
             }
@@ -144,7 +145,7 @@ class HtmlLexer {
         $this->tokens[] = new Token(self::TAG_EQUALS, '=');
 
         if ($this->isWS()) {
-            $this->WS();
+            $this->WS(self::TAG_WS);
         }
 
         if ($this->c === "'") {

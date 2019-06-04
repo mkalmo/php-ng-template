@@ -14,19 +14,19 @@ class LexerTests extends ExtendedTestCase {
         $this->assertListEqual([
             HtmlLexer::TAG_OPEN,
             HtmlLexer::TAG_NAME,
-            HtmlLexer::WS,
+            HtmlLexer::TAG_WS,
             HtmlLexer::TAG_NAME,
             HtmlLexer::TAG_EQUALS,
             HtmlLexer::DOUBLE_QUOTE_STRING,
-            HtmlLexer::WS,
+            HtmlLexer::TAG_WS,
             HtmlLexer::TAG_NAME,
-            HtmlLexer::WS,
+            HtmlLexer::TAG_WS,
             HtmlLexer::TAG_NAME,
-            HtmlLexer::WS,
+            HtmlLexer::TAG_WS,
             HtmlLexer::TAG_EQUALS,
-            HtmlLexer::WS,
+            HtmlLexer::TAG_WS,
             HtmlLexer::UNQUOTED_STRING,
-            HtmlLexer::WS,
+            HtmlLexer::TAG_WS,
             HtmlLexer::TAG_CLOSE
 
         ], self::tokenTypes($tokens));
@@ -54,7 +54,7 @@ class LexerTests extends ExtendedTestCase {
         $this->assertListEqual([
             HtmlLexer::TAG_OPEN,
             HtmlLexer::TAG_NAME,
-            HtmlLexer::WS,
+            HtmlLexer::TAG_WS,
             HtmlLexer::TAG_SLASH_CLOSE
 
         ], $this->tokenTypes($tokens));
@@ -100,7 +100,7 @@ class LexerTests extends ExtendedTestCase {
         $tokens = (new HtmlLexer($input))->tokenize();
 
         $this->assertListEqual([
-            HtmlLexer::WS,
+            HtmlLexer::SEA_WS,
             HtmlLexer::HTML_TEXT
 
         ], $this->tokenTypes($tokens));
