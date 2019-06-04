@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 abstract class AbstractActions {
 
     public abstract function tagStartAction($tagName, $attributes);

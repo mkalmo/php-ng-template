@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 require_once('HtmlLexer.php');
 require_once('HtmlParser.php');
 require_once('TreeBuilderActions.php');

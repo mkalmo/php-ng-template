@@ -1,17 +1,12 @@
 <?php
 
-require_once '../src/parser/Parser.php';
-require_once '../src/Scope.php';
-
-use tpl\Scope;
+require_once 'parser/FileParser.php';
+require_once 'Scope.php';
 
 function render_template($templatePath, $data = []) {
 
-    $html = file_get_contents($templatePath);
+    $tree = (new tplLib\FileParser($templatePath))->parse();
 
-    $node = (new Parser())->parse($html);
-
-    var_dump($node);
-
-    return $node->render(new Scope($data));
+    return $tree->render(new tplLib\Scope($data, realpath(dirname($templatePath))));
 }
+

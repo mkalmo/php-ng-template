@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 class TextNode extends AbstractNode {
 
     private $text;

@@ -1,6 +1,8 @@
 <?php
 
-class ParseException extends Exception {
+namespace tplLib;
+
+class ParseException extends \Exception {
 
     public $message;
     public $pos;

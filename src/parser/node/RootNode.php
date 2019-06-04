@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 require_once 'AbstractNode.php';
 
 class RootNode extends AbstractNode {

@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 abstract class AbstractNode {
 
     protected $token;

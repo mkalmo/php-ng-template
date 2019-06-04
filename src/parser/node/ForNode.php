@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 require_once 'TagNode.php';
 
 class ForNode extends TagNode {

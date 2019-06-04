@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 require_once 'Token.php';
 require_once('HtmlLexer.php');
 require_once('NopActions.php');

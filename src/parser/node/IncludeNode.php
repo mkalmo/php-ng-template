@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 require_once 'TagNode.php';
 
 class IncludeNode extends TagNode {
@@ -9,7 +11,7 @@ class IncludeNode extends TagNode {
 
         $path = $this->removeQuotes($path);
 
-        $html = file_get_contents($path);
+        $html = file_get_contents($scope->mainTemplatePath . '/' . $path);
 
         $tree = $this->buildTree($html);
 

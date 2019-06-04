@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 require_once 'RootNode.php';
 require_once 'AbstractNode.php';
 

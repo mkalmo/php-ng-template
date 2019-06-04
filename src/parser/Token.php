@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 class Token {
 
     public $type;

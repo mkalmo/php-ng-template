@@ -1,10 +1,14 @@
 <?php
 
+namespace tplLib;
+
 class Scope {
     private $layers = [];
+    public $mainTemplatePath;
 
-    public function __construct($data = []) {
+    public function __construct($data = [], $mainTemplatePath = null) {
         $this->addLayer($data);
+        $this->mainTemplatePath = $mainTemplatePath;
     }
 
     public function replaceCurlyExpression($text) {

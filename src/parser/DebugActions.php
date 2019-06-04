@@ -1,5 +1,7 @@
 <?php
 
+namespace tplLib;
+
 require_once 'node/RootNode.php';
 require_once 'node/TagNode.php';
 require_once 'node/VoidTagNode.php';

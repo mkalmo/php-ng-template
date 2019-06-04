@@ -1,6 +1,7 @@
 <?php
 
-require_once '../src/Scope.php';
+namespace tplLib;
+
 
 class MiscNode extends AbstractNode {
 
