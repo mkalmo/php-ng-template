@@ -27,8 +27,10 @@ class DebugActions {
     }
 
     public function staticElementAction($token) {
-        throw new Error();
-
         printf('static: "%s"' . PHP_EOL, $token->text);
+    }
+
+    public function getResult() {
+        return new MiscNode('dummy');
     }
 }

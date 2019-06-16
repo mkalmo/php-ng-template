@@ -4,6 +4,13 @@ require_once('ExtendedTextCase.php');
 require_once('../src/parser/HtmlParser.php');
 require_once('../src/parser/TreeBuilderActions.php');
 
+use tplLib\HtmlLexer;
+use tplLib\HtmlParser;
+use tplLib\TreeBuilderActions;
+use tplLib\TextNode;
+use tplLib\MiscNode;
+use tplLib\WsNode;
+
 class TreeBuilderTests extends ExtendedTestCase {
 
     function textOutsideTags() {

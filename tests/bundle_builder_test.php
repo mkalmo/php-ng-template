@@ -11,9 +11,14 @@ class BundleBuilderTests extends ExtendedTestCase {
 
         $builder = new BundleBuilder($rootFile);
 
+        $result = $builder->build();
+
+        $result = preg_replace('/namespace/', '', $result);
+        $result = preg_replace('/\s/', '', $result);
+        $result = preg_replace('/[{}]/', '', $result);
+
         $this->assertEqual(
-            "'1';'sub_sub_1';'sub_1';'sub_2';'sub_sub_1';'root';",
-            $builder->build());
+            "'1';'sub_sub_1';'sub_1';'sub_2';'root';", $result);
     }
 }
 

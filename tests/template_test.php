@@ -8,6 +8,10 @@ require_once('../src/parser/HtmlParser.php');
 require_once('../src/parser/HtmlLexer.php');
 require_once('../src/parser/TreeBuilderActions.php');
 
+use tplLib\HtmlLexer;
+use tplLib\HtmlParser;
+use tplLib\TreeBuilderActions;
+use tplLib\Scope;
 
 class TemplateTests extends ExtendedTestCase {
 

@@ -24,6 +24,10 @@ class HtmlParser {
         $this->htmlDocument();
     }
 
+    public function parseFragment() {
+        $this->htmlContent();
+    }
+
     private function htmlDocument() {
         // htmlDocument
         //    : SEA_WS? xml? SEA_WS? dtd? SEA_WS? htmlElements*
@@ -268,7 +272,7 @@ class HtmlParser {
     }
 
     public function consume() {
-//        printf('%s' . PHP_EOL, $this->ltt());
+        // printf('%s' . PHP_EOL, $this->ltt());
 
         $this->consumedPos += strlen($this->lt()->text);
         $this->p++;

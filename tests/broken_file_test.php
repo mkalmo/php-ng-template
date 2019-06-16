@@ -2,8 +2,13 @@
 
 require_once('ExtendedTextCase.php');
 require_once('../src/parser/FileParser.php');
+require_once('../src/Scope.php');
+
+use tplLib\FileParser;
+use tplLib\Scope;
 
 class BrokenFileTests extends ExtendedTestCase {
+
 
     function x_allFromFile() {
         foreach (new DirectoryIterator('test-data/samples') as $fileInfo) {
@@ -19,13 +24,15 @@ class BrokenFileTests extends ExtendedTestCase {
         }
     }
 
-    function x_fromFile() {
-        $path = 'test-data/simple/d.html';
+    function _fromFile() {
+        $path = 'test-data/tpl/main.html';
 
-        (new FileParser($path))->parse();
+        $tree = (new FileParser($path))->parse();
+
+        $scope = new Scope([], dirname($path));
+
+        print $tree->render($scope);
     }
-
-
 
 }
 

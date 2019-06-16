@@ -37,7 +37,7 @@ class FileParser {
             realpath($this->filePath),
             $this->locationString($e->pos));
 
-        return new Error($message);
+        return new \Error($message);
     }
 
     private function locationString($pos) {

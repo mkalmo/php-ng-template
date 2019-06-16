@@ -24,7 +24,7 @@ class IncludeNode extends TagNode {
 
         $builder = new TreeBuilderActions();
 
-        (new HtmlParser($tokens, $builder))->parse();
+        (new HtmlParser($tokens, $builder))->parseFragment();
 
         return $builder->getResult();
 

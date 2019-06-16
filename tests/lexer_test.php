@@ -1,8 +1,11 @@
 <?php
 
 require_once('ExtendedTextCase.php');
-require_once('../src/parser/ListLexer.php');
 require_once('../src/parser/HtmlLexer.php');
+require_once('../src/parser/ParseException.php');
+
+use tplLib\HtmlLexer;
+use tplLib\ParseException;
 
 class LexerTests extends ExtendedTestCase {
 
@@ -104,6 +107,12 @@ class LexerTests extends ExtendedTestCase {
             HtmlLexer::HTML_TEXT
 
         ], $this->tokenTypes($tokens));
+    }
+
+    function test() {
+        $input = '<input/>&<input/>';
+
+        $tokens = (new HtmlLexer($input))->tokenize();
     }
 
     function invalidSymbol() {

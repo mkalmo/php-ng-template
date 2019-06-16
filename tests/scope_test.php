@@ -5,6 +5,8 @@ require_once('ExtendedTextCase.php');
 require_once '../src/Scope.php';
 require_once('Customer.class.php');
 
+use tplLib\Scope;
+
 class ScopeTests extends ExtendedTestCase {
 
     function canEvaluateStringExpressions() {
