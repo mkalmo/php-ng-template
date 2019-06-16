@@ -24,7 +24,7 @@ class BrokenFileTests extends ExtendedTestCase {
         }
     }
 
-    function _fromFile() {
+    function x_fromFile() {
         $path = 'test-data/tpl/main.html';
 
         $tree = (new FileParser($path))->parse();

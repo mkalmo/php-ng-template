@@ -15,7 +15,13 @@ require_once('../src/Entry.php');
 
 //print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,2));
 
-foreach (new DirectoryIterator('test-data/samples') as $fileInfo) {
-    if($fileInfo->isDot()) continue;
-    echo $fileInfo->getPathname() . PHP_EOL;
-}
+//$a = file('/home/mkalmo/git/php/php-template/tests/test-data/tpl/');
+
+$d = '';
+
+define('__FILE1__', '/home/mkalmo/tmp');
+
+print eval("\$d = (dirname(__FILE1__) . '/../helpers.php');");
+
+print $d;
+

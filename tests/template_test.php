@@ -7,6 +7,7 @@ require_once('../src/Scope.php');
 require_once('../src/parser/HtmlParser.php');
 require_once('../src/parser/HtmlLexer.php');
 require_once('../src/parser/TreeBuilderActions.php');
+require_once('../src/parser/helpers.php');
 
 use tplLib\HtmlLexer;
 use tplLib\HtmlParser;
@@ -86,10 +87,10 @@ class TemplateTests extends ExtendedTestCase {
         $this->assertEqual('<p>1<i>2</i><i>3</i>1</p>', $tree->render($scope));
     }
 
-    function _fromFileSmokeTest() {
+    function fromFileSmokeTest() {
         $mainTemplate = realpath('test-data/tpl/main.html');
 
-        $input = file_get_contents($mainTemplate);
+        $input = tplLib\read_file($mainTemplate);
 
         $tree = $this->buildTree($input);
 
@@ -115,7 +116,6 @@ class TemplateTests extends ExtendedTestCase {
         (new HtmlParser($tokens, $builder))->parse();
 
         return $builder->getResult();
-
     }
 
 }

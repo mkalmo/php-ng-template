@@ -5,6 +5,7 @@ namespace tplLib;
 require_once('HtmlLexer.php');
 require_once('HtmlParser.php');
 require_once('TreeBuilderActions.php');
+require_once('ParseException.php');
 
 class FileParser {
 
@@ -13,7 +14,7 @@ class FileParser {
 
     public function __construct($filePath) {
         $this->filePath = $filePath;
-        $this->input = file_get_contents($this->filePath);
+        $this->input = read_file($this->filePath);
     }
 
     public function parse() {

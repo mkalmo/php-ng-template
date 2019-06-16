@@ -33,7 +33,7 @@ class BundleBuilder {
 
             $tmp = trim($line);
             if ($this->isRequireLine($tmp)) {
-                $dependencies[] = $this->getRequirePath($tmp);
+                $dependencies[] = $this->getRequirePath($tmp, $filePath);
             } else {
                 $content[] = $line;
             }
@@ -43,7 +43,10 @@ class BundleBuilder {
 
         foreach ($dependencies as $dependency) {
             $dir = dirname($filePath);
-            $dependencyPath = $this->concatPath($dir, $dependency);
+
+            $dependencyPath = preg_match('!^/!', $dependency)
+                ? $dependency
+                : $this->concatPath($dir, $dependency);
 
             if (!in_array(realpath($dependencyPath), $this->alreadySeen)) {
                 $childNode = $this->createFileNode($dependencyPath);
@@ -74,14 +77,21 @@ class BundleBuilder {
         return $string;
     }
 
-    function getRequirePath($string) {
-        $string = preg_replace('/^require_once/', '', $string);
-        $string = trim($string);
-        $string = preg_replace('/[\(\)]/', '', $string);
-        $string = preg_replace('/^[\'"]/', '', $string);
-        $string = preg_replace('/;$/', '', $string);
-        $string = preg_replace('/[\'"]$/', '', $string);
-        return $string;
+    function getRequirePath($string, $parentPath) {
+        $string = preg_replace('/^require_once/', '', trim($string));
+
+        $string = preg_replace(
+            '/__FILE__/',
+            "'" . realpath($parentPath) . "'",
+            $string);
+
+        $path = '';
+
+        $string = '$path = ' . $string;
+
+        eval($string);
+
+        return $path;
     }
 
 }
