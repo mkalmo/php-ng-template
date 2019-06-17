@@ -31,7 +31,7 @@ class RenderTests extends ExtendedTestCase {
         $this->assertEqual($input, $tree->render(new Scope()));
     }
 
-    function _renderFragment() {
+    function renderFragment() {
         $input = '<input/>a<input/>';
 
         $tokens = (new HtmlLexer($input))->tokenize();

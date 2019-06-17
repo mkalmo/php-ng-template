@@ -64,9 +64,22 @@ class ScopeTests extends ExtendedTestCase {
     function removingLastScopeLayerThrows() {
         $scope = new Scope();
 
-        $this->expectException();
+        $this->expectException(new Exception("can't remove last layer"));
 
         $scope->removeLayer();
+    }
+
+    function _replaceCurlyExpression() {
+        $actual = (new Scope())->replaceCurlyExpression(
+            '{{ 1 }} {{ 1 + 1 }} {{ "&<" }}');
+
+        $this->assertEqual("1 2 &amp;&lt;", $actual);
+    }
+
+    function replaceCurlyExpressionEvalError() {
+        $this->expectException(new Exception("error evaluating  a "));
+
+        (new Scope())->replaceCurlyExpression('{{ a }}');
     }
 }
 

@@ -12,19 +12,45 @@ class Scope {
     }
 
     public function replaceCurlyExpression($text) {
-        return preg_replace_callback(
-            '|{{\s*(\$[^\s]+)\s*}}|im',
+        $result = preg_replace_callback(
+            '|{{(.+?)}}|im',
             function ($matches) {
-                return $this->evaluate($matches[1]);
+                return $this->evaluate(trim($matches[1]));
             },
             $text);
+
+        return htmlspecialchars($result, ENT_NOQUOTES);
     }
 
     function evaluate($expression) {
-        return $this->evaluate_sub($expression, $this->getData());
+        $isError = false;
+
+        $handler = function ($errno, $errstr, $errfile, $errline)
+        use (&$isError) {
+            $isError = $errno !== E_NOTICE;
+        };
+
+        $data = $this->getData();
+
+        $oldHandler = set_error_handler($handler);
+
+        try {
+            $result = $this->evaluateSub($expression, $data);
+        } catch (\Error $error) {
+            throw new \Exception(
+                "error evaluating: $expression; " .  $error->getMessage());
+        }
+
+        set_error_handler($oldHandler);
+
+        if ($isError) {
+            throw new \Exception("error evaluating: $expression");
+        }
+
+        return $result;
     }
 
-    private function evaluate_sub($expression_8slSL29x, $data_8slSL29x) {
+    private function evaluateSub($expression_8slSL29x, $data_8slSL29x) {
         foreach ($data_8slSL29x as $key_8slSL29x => $value_8slSL29x) {
             ${ $key_8slSL29x } = $value_8slSL29x;
         }

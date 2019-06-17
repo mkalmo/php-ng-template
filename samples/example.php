@@ -1,7 +1,7 @@
 <?php
 
-//require_once '../src/tpl2.php';
-require_once '../dist/tpl.php';
+require_once '../src/tpl2.php';
+//require_once '../dist/tpl.php';
 
 $templatePath = '../tests/test-data/tpl/main.html';
 

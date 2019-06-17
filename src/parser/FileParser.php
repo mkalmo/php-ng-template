@@ -33,12 +33,12 @@ class FileParser {
     }
 
     private function error($e) {
-        $message = printf("%s \nat %s:%s\n",
+        $message = sprintf("%s \nat %s:%s\n",
             $e->message,
             realpath($this->filePath),
             $this->locationString($e->pos));
 
-        return new \Error($message);
+        return new \Exception($message);
     }
 
     private function locationString($pos) {

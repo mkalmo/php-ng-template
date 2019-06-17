@@ -14,7 +14,7 @@ class IncludeNode extends TagNode {
         $path = $this->removeQuotes($path);
 
         if (strlen($path) === 0) {
-            throw new \Error("tpl-include file path is missing");
+            throw new \Exception("tpl-include file path is missing");
         }
 
         $path = $scope->mainTemplatePath . '/' . $path;
