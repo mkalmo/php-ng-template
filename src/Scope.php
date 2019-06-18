@@ -15,11 +15,12 @@ class Scope {
         $result = preg_replace_callback(
             '|{{(.+?)}}|im',
             function ($matches) {
-                return $this->evaluate(trim($matches[1]));
+                $result = $this->evaluate(trim($matches[1]));
+                return htmlspecialchars($result, ENT_NOQUOTES);
             },
             $text);
 
-        return htmlspecialchars($result, ENT_NOQUOTES);
+        return $result;
     }
 
     function evaluate($expression) {
