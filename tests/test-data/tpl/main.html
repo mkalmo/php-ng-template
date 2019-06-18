@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <title>{{ $title1 }} - {{ $title2 }}</title>
+</head>
+<body>
+
+<div class="{{ $cssClass }}" ></div>
+
+<div tpl-if="$flag1">
+    should remain
+</div>
+
+<div tpl-if="$flag2">
+    should be removed
+</div>
+
+<div tpl-foreach="$list1 as $each">
+    {{ $each }}
+</div>
+
+<div tpl-include="menu.html"></div>
+
+<div tpl-include="{{ $contentPath }}"></div>
+
+</body>
+</html>

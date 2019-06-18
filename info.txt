@@ -1,0 +1,4 @@
+
+https://developer.mozilla.org/en-US/docs/Glossary/Empty_element
+
+http://us2.php.net/manual/en/language.oop5.cloning.php
