@@ -15,4 +15,3 @@ function render_template($templatePath, $data = []) {
         printf('<pre>%s%s%s</pre>', PHP_EOL, $e->getMessage(), PHP_EOL);
     }
 }
-

@@ -2,10 +2,16 @@
 
 require_once 'src/BundleBuilder.php';
 
-$rootFile = 'src/tpl2.php';
+$rootFile = 'src/tpl.php';
 
 $builder = new BundleBuilder($rootFile);
 
 $content = $builder->build();
 
-file_put_contents('./dist/tpl.php', "<?php\n" . $content);
+$dir = "./dist";
+
+if (!is_dir($dir)) {
+    mkdir($dir);
+}
+
+file_put_contents("$dir/tpl.php", "<?php\n" . $content);

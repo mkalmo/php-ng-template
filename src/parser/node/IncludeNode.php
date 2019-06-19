@@ -3,7 +3,7 @@
 namespace tplLib;
 
 require_once 'TagNode.php';
-require_once dirname(__FILE__) . '/../helpers.php';
+require_once __DIR__ . '/../helpers.php';
 
 class IncludeNode extends TagNode {
 

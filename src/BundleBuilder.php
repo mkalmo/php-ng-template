@@ -81,15 +81,13 @@ class BundleBuilder {
         $string = preg_replace('/^require_once/', '', trim($string));
 
         $string = preg_replace(
-            '/__FILE__/',
-            "'" . realpath($parentPath) . "'",
+            '/__DIR__/',
+            "'" . realpath(dirname($parentPath)) . "'",
             $string);
 
         $path = '';
 
-        $string = '$path = ' . $string;
-
-        eval($string);
+        eval('$path = ' . $string);
 
         return $path;
     }
