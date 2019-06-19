@@ -68,3 +68,15 @@ Will render:
   loaded from the $path -->
 </div>
 ```
+
+## Build single bundle from the source
+
+```
+php build.php
+```
+
+produces single file
+
+```
+./dist/tpl.php
+```
