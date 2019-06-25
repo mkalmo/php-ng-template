@@ -90,7 +90,7 @@ class TemplateTests extends ExtendedTestCase {
     function fromFileSmokeTest() {
         $mainTemplate = realpath('test-data/tpl/main.html');
 
-        $input = tplLib\read_file($mainTemplate);
+        $input = tplLib\loadContents($mainTemplate);
 
         $tree = $this->buildTree($input);
 

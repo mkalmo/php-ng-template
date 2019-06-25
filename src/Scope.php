@@ -23,7 +23,7 @@ class Scope {
         return $result;
     }
 
-    function evaluate($expression) {
+    public function evaluate($expression) {
         $isError = false;
 
         $handler = function ($errno, $errstr, $errfile, $errline)

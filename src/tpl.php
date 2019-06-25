@@ -3,7 +3,7 @@
 require_once 'parser/FileParser.php';
 require_once 'Scope.php';
 
-function render_template($templatePath, $data = []) {
+function renderTemplate($templatePath, $data = []) {
 
     try {
         $tree = (new tplLib\FileParser($templatePath))->parse();

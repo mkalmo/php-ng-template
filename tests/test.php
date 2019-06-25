@@ -11,7 +11,7 @@ require_once('../src/Entry.php');
 //    '$fragment_path' => '../tpl/fragment2.html',
 //    '$list' => [1, 2, 3]];
 //
-//echo render_template('../tpl/main.html', $data);
+//echo renderTemplate('../tpl/main.html', $data);
 
 //print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,2));
 

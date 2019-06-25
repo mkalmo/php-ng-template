@@ -19,7 +19,7 @@ class IncludeNode extends TagNode {
 
         $path = $scope->mainTemplatePath . '/' . $path;
 
-        $html = read_file($path);
+        $html = loadContents($path);
 
         $tree = $this->buildTree($html);
 

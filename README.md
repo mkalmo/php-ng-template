@@ -12,7 +12,7 @@ $data = [
   'path' => 'sub.html'  
 ];
 
-print render_template('tpl/main.html', $data);
+print renderTemplate('tpl/main.html', $data);
 ```
 
 ## Template syntax

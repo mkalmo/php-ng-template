@@ -204,7 +204,7 @@ class HtmlLexer {
             }
         }
 
-        return  $stringToMatch;
+        return $stringToMatch;
     }
 
     private function throwException($message) {

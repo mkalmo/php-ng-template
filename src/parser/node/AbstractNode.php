@@ -16,9 +16,6 @@ abstract class AbstractNode {
 
     public function getTagName() {
         return $this->token;
-
-
-//        return $this->token->getTagName();
     }
 
     public function getTokenContents() {

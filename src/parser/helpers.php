@@ -2,14 +2,14 @@
 
 namespace tplLib;
 
-function read_file($filePath) {
+function loadContents($filePath) {
     if (is_dir($filePath)) {
         throw new \Exception("$filePath is directory");
     }
 
     $contents = file_get_contents($filePath);
 
-    if ($contents === FALSE) {
+    if ($contents === false) {
         throw new \Exception("can't read file: $filePath");
     }
 

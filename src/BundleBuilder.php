@@ -15,7 +15,7 @@ class BundleBuilder {
         return $rootNode->__toString();
     }
 
-    function createFileNode($filePath) {
+    private function createFileNode($filePath) {
         $this->alreadySeen[] = realpath($filePath);
 
         $content = [];
@@ -58,26 +58,26 @@ class BundleBuilder {
         return $node;
     }
 
-    function concatPath($root, $relative) {
+    private function concatPath($root, $relative) {
         return join('/', [$root, $relative]);
     }
 
-    function isRequireLine($string) {
+    private function isRequireLine($string) {
         return preg_match('/^require_once/', $string);
     }
 
-    function isNamespaceLine($string) {
+    private function isNamespaceLine($string) {
         return preg_match('/^namespace/', $string);
     }
 
-    function getNamespace($string) {
+    private function getNamespace($string) {
         $string = preg_replace('/^namespace/', '', $string);
         $string = trim($string);
         $string = preg_replace('/;$/', '', $string);
         return $string;
     }
 
-    function getRequirePath($string, $parentPath) {
+    private function getRequirePath($string, $parentPath) {
         $string = preg_replace('/^require_once/', '', trim($string));
 
         $string = preg_replace(

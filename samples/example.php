@@ -16,4 +16,4 @@ $data = [
     'contentPath' => 'content.html',
 ];
 
-print render_template($templatePath, $data);
+print renderTemplate($templatePath, $data);
