@@ -1,3 +1,9 @@
+<!--
+  google-site-verification: oQRd5iL1iUxbtlkXplvuKjhxiHbjfyoYTSN8bh8JC10
+  -->
+
+<meta name="google-site-verification" content="oQRd5iL1iUxbtlkXplvuKjhxiHbjfyoYTSN8bh8JC10" />
+
 # AngularJs like templates for PHP
 
 Loading the library and rendering a template.
