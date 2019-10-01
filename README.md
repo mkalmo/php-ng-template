@@ -20,13 +20,25 @@ print renderTemplate('tpl/main.html', $data);
 ### Simple variable substitution
 
 ```
-<div>{{ $greeting }}</div>
+{{ $greeting }}
 ```
 
 Will render:
 
 ```
-<div>Hello!</div>
+Hello!
+```
+
+### Using functions
+
+```
+{{ join(', ', $list }}
+```
+
+Will render:
+
+```
+1, 2, 3
 ```
 
 ### Conditional content
