@@ -9,7 +9,6 @@ use tplLib\Scope;
 
 class BrokenFileTests extends ExtendedTestCase {
 
-
     function x_allFromFile() {
         foreach (new DirectoryIterator('test-data/samples') as $fileInfo) {
             if($fileInfo->isDot()) {

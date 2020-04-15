@@ -3,24 +3,30 @@
 namespace tplLib;
 
 class Scope {
-    private $layers = [];
     public $mainTemplatePath;
 
-    public function __construct($data = [], $mainTemplatePath = null) {
+    private $layers = [];
+    private $translations = [];
+
+    public function __construct($data = [],
+                                $translations = [],
+                                $mainTemplatePath = null) {
+
+        $this->translations = $translations;
+
         $this->addLayer($data);
+
         $this->mainTemplatePath = $mainTemplatePath;
     }
 
     public function replaceCurlyExpression($text) {
-        $result = preg_replace_callback(
+        return preg_replace_callback(
             '|{{(.+?)}}|im',
             function ($matches) {
                 $result = $this->evaluate(trim($matches[1]));
                 return htmlspecialchars($result, ENT_NOQUOTES);
             },
             $text);
-
-        return $result;
     }
 
     public function evaluate($expression) {
@@ -35,20 +41,32 @@ class Scope {
 
         $oldHandler = set_error_handler($handler);
 
+        if ($this->isTranslation($expression)) {
+            return isset($this->translations[$expression]) ?
+                $this->translations[$expression] : '';
+        }
+
         try {
             $result = $this->evaluateSub($expression, $data);
         } catch (\Error $error) {
-            throw new \Exception(
-                "error evaluating: $expression; " .  $error->getMessage());
+            $this->throwEvaluateException($expression);
         }
 
         set_error_handler($oldHandler);
 
         if ($isError) {
-            throw new \Exception("error evaluating: $expression");
+            $this->throwEvaluateException($expression);
         }
 
         return $result;
+    }
+
+    private function throwEvaluateException($expression) {
+        throw new \Exception("error evaluating: '$expression'");
+    }
+
+    private function isTranslation($expression) {
+        return preg_match('/^[_a-zA-Z][-_0-9a-zA-Z]*$/', $expression);
     }
 
     private function evaluateSub($expression_8slSL29x, $data_8slSL29x) {

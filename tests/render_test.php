@@ -49,7 +49,6 @@ class RenderTests extends ExtendedTestCase {
         $tokens = (new HtmlLexer($html))->tokenize();
 
         $builder = new TreeBuilderActions();
-//        $builder = new DebugActions();
 
         (new HtmlParser($tokens, $builder))->parse();
 

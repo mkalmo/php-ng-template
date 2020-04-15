@@ -15,6 +15,16 @@ $data = [
 print renderTemplate('tpl/main.html', $data);
 ```
 
+Method renderTemplate() takes a dictionary with translations as an optional third argument.
+
+```
+
+$translations = ['lang-en' => 'English'];
+
+print renderTemplate('tpl/main.html', [], $translations);
+```
+
+
 ## Template syntax
 
 ### Simple variable substitution
@@ -79,6 +89,23 @@ Will render:
   content from sub template
   loaded from the $path -->
 </div>
+```
+
+### Translations
+
+Translation keys have different syntax (without $ symbol).
+
+Translation key must start with a letter or underscore and can contain 
+letters, underscores or hyphens.
+
+```
+{{ lang-en }}
+```
+
+Will render:
+
+```
+English
 ```
 
 ## Build single bundle from the source

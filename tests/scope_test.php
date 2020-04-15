@@ -69,7 +69,7 @@ class ScopeTests extends ExtendedTestCase {
         $scope->removeLayer();
     }
 
-    function _replaceCurlyExpression() {
+    function replaceCurlyExpression() {
         $actual = (new Scope())->replaceCurlyExpression(
             '{{ 1 }} {{ 1 + 1 }} {{ "&<" }}');
 
@@ -77,9 +77,9 @@ class ScopeTests extends ExtendedTestCase {
     }
 
     function replaceCurlyExpressionEvalError() {
-        $this->expectException(new Exception("error evaluating  a "));
+        $this->expectException(new Exception("error evaluating: '1a'"));
 
-        (new Scope())->replaceCurlyExpression('{{ a }}');
+        (new Scope())->replaceCurlyExpression('{{ 1a }}');
     }
 }
 

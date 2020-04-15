@@ -87,6 +87,16 @@ class TemplateTests extends ExtendedTestCase {
         $this->assertEqual('<p>1<i>2</i><i>3</i>1</p>', $tree->render($scope));
     }
 
+    function replacesTranslations() {
+        $input = '{{ lang-en }}';
+
+        $tree = $this->buildTree($input);
+
+        $scope = new Scope([], ['lang-en' => 'English']);
+
+        $this->assertEqual('English', $tree->render($scope));
+    }
+
     function fromFileSmokeTest() {
         $mainTemplate = realpath('test-data/tpl/main.html');
 
@@ -94,7 +104,7 @@ class TemplateTests extends ExtendedTestCase {
 
         $tree = $this->buildTree($input);
 
-        $scope = new Scope([
+        $data = [
             'title1' => 't1',
             'title2' => 't2',
             'flag1' => true,
@@ -103,7 +113,13 @@ class TemplateTests extends ExtendedTestCase {
             'list1' => [1, 2],
             'menuItems' => [1, 2],
             'contentPath' => 'content.html',
-        ], dirname($mainTemplate));
+        ];
+
+        $translations = [
+            'lang_eng' => 'English'
+        ];
+
+        $scope = new Scope($data, $translations, dirname($mainTemplate));
 
         $tree->render($scope);
     }
