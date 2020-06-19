@@ -22,6 +22,10 @@ class TagNode extends AbstractNode {
             $contents .= $child->render($scope);
         }
 
+        if ($this->name === 'tpl') {
+            return $contents;
+        }
+
         return sprintf('<%1$s%2$s>%3$s</%1$s>',
             $this->name, $this->attributeString($scope), $contents);
     }
@@ -46,5 +50,15 @@ class TagNode extends AbstractNode {
     public function getTagName() {
         return $this->name;
     }
+
+    protected function getExpression($attributeName) {
+        $value = $this->attributes[$attributeName];
+
+        $value = preg_replace("/^['\"]/", '', $value);
+        $value = preg_replace("/['\"]$/", '', $value);
+
+        return $value;
+    }
+
 
 }

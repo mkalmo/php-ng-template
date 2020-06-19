@@ -9,9 +9,7 @@ class IncludeNode extends TagNode {
 
     public function render($scope) {
 
-        $path = $scope->replaceCurlyExpression($this->getExpression());
-
-        $path = $this->removeQuotes($path);
+        $path = $scope->replaceCurlyExpression($this->getExpression('tpl-include'));
 
         if (strlen($path) === 0) {
             throw new \Exception("tpl-include file path is missing");
@@ -23,8 +21,9 @@ class IncludeNode extends TagNode {
 
         $tree = $this->buildTree($html);
 
-        return sprintf('<%1$s%2$s>%3$s</%1$s>',
-            $this->name, $this->attributeString($scope), $tree->render($scope));
+        $this->addChild($tree);
+
+        return parent::render($scope);
     }
 
     private function buildTree($html) {
@@ -35,19 +34,5 @@ class IncludeNode extends TagNode {
         (new HtmlParser($tokens, $builder))->parseFragment();
 
         return $builder->getResult();
-
-    }
-
-    private function removeQuotes($string) {
-        $string = preg_replace("/^['\"]/", '', $string);
-        $string = preg_replace("/['\"]$/", '', $string);
-
-        return $string;
-
-    }
-
-    private function getExpression() {
-        return $this->attributes['tpl-include'];
-
     }
 }

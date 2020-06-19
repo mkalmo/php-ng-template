@@ -8,7 +8,7 @@ class ForNode extends TagNode {
 
     public function render($scope) {
 
-        $parts = preg_split('/\s+as\s+/', $this->getExpression());
+        $parts = preg_split('/\s+as\s+/', $this->getExpression('tpl-foreach'));
         $expression = trim($parts[0]);
         $variableName = trim($parts[1]);
         $variableName = substr($variableName, 1);
@@ -35,14 +35,5 @@ class ForNode extends TagNode {
         }
 
         return $result;
-    }
-
-    private function getExpression() {
-        $value = $this->attributes['tpl-foreach'];
-
-        $value = preg_replace("/^['\"]/", '', $value);
-        $value = preg_replace("/['\"]$/", '', $value);
-
-        return $value;
     }
 }

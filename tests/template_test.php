@@ -87,6 +87,47 @@ class TemplateTests extends ExtendedTestCase {
         $this->assertEqual('<p>1<i>2</i><i>3</i>1</p>', $tree->render($scope));
     }
 
+    function tplSelected() {
+        $input = '<div tpl-selected="$isSelected"></div>';
+        $expectedFalse = '<div></div>';
+        $expectedTrue = '<div selected="selected"></div>';
+
+        $tree = $this->buildTree($input);
+
+        $scope = new Scope(['isSelected' => false]);
+
+        $this->assertEqual($expectedFalse, $tree->render($scope));
+
+        $scope = new Scope(['isSelected' => true]);
+
+        $this->assertEqual($expectedTrue, $tree->render($scope));
+    }
+
+    function tplChecked() {
+        $input = '<div tpl-checked="$isChecked"></div>';
+        $expectedFalse = '<div></div>';
+        $expectedTrue = '<div checked="checked"></div>';
+
+        $tree = $this->buildTree($input);
+
+        $scope = new Scope(['isChecked' => false]);
+
+        $this->assertEqual($expectedFalse, $tree->render($scope));
+
+        $scope = new Scope(['isChecked' => true]);
+
+        $this->assertEqual($expectedTrue, $tree->render($scope));
+    }
+
+    function tplNodeIsRemoved() {
+        $input = '<tpl>a</tpl>';
+        $expected = 'a';
+
+        $tree = $this->buildTree($input);
+
+        $this->assertEqual($expected, $tree->render(new Scope()));
+    }
+
     function replacesTranslations() {
         $input = '{{ lang-en }}';
 

@@ -11,6 +11,7 @@ require_once 'node/WsNode.php';
 require_once 'node/IfNode.php';
 require_once 'node/ForNode.php';
 require_once 'node/IncludeNode.php';
+require_once 'node/AttributeNode.php';
 
 class TreeBuilderActions {
 
@@ -38,6 +39,10 @@ class TreeBuilderActions {
             $node = new ForNode($tagName, $attributes);
         } else if (isset($attributes['tpl-include'])) {
             $node = new IncludeNode($tagName, $attributes);
+        } else if (isset($attributes['tpl-selected'])) {
+            $node = new AttributeNode($tagName, $attributes, 'tpl-selected', 'selected');
+        } else if (isset($attributes['tpl-checked'])) {
+            $node = new AttributeNode($tagName, $attributes, 'tpl-checked', 'checked');
         } else {
             $node = new TagNode($tagName, $attributes);
         }
