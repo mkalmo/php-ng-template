@@ -4,7 +4,6 @@ namespace tplLib;
 
 require_once 'node/RootNode.php';
 require_once 'node/TagNode.php';
-require_once 'node/VoidTagNode.php';
 require_once 'node/TextNode.php';
 require_once 'node/MiscNode.php';
 require_once 'node/WsNode.php';

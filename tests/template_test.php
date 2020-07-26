@@ -104,9 +104,9 @@ class TemplateTests extends ExtendedTestCase {
     }
 
     function tplChecked() {
-        $input = '<div tpl-checked="$isChecked"></div>';
-        $expectedFalse = '<div></div>';
-        $expectedTrue = '<div checked="checked"></div>';
+        $input = '<input tpl-checked="$isChecked">';
+        $expectedFalse = '<input>';
+        $expectedTrue = '<input checked="checked">';
 
         $tree = $this->buildTree($input);
 
@@ -119,7 +119,7 @@ class TemplateTests extends ExtendedTestCase {
         $this->assertEqual($expectedTrue, $tree->render($scope));
     }
 
-    function tplNodeIsRemoved() {
+    function tplTagIsRemovedButContentRemains() {
         $input = '<tpl>a</tpl>';
         $expected = 'a';
 

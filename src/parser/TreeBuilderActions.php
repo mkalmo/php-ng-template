@@ -4,7 +4,6 @@ namespace tplLib;
 
 require_once 'node/RootNode.php';
 require_once 'node/TagNode.php';
-require_once 'node/VoidTagNode.php';
 require_once 'node/TextNode.php';
 require_once 'node/MiscNode.php';
 require_once 'node/WsNode.php';
@@ -32,24 +31,27 @@ class TreeBuilderActions {
     }
 
     public function tagStartAction($tagName, $attributes) {
-
-        if (isset($attributes['tpl-if'])) {
-            $node = new IfNode($tagName, $attributes);
-        } else if (isset($attributes['tpl-foreach'])) {
-            $node = new ForNode($tagName, $attributes);
-        } else if (isset($attributes['tpl-include'])) {
-            $node = new IncludeNode($tagName, $attributes);
-        } else if (isset($attributes['tpl-selected'])) {
-            $node = new AttributeNode($tagName, $attributes, 'tpl-selected', 'selected');
-        } else if (isset($attributes['tpl-checked'])) {
-            $node = new AttributeNode($tagName, $attributes, 'tpl-checked', 'checked');
-        } else {
-            $node = new TagNode($tagName, $attributes);
-        }
+        $node = $this->createTag($tagName, $attributes);
 
         $this->currentNode()->addChild($node);
 
         $this->stack[] = $node;
+    }
+
+    private function createTag($tagName, $attributes) {
+        if (isset($attributes['tpl-if'])) {
+            return new IfNode($tagName, $attributes);
+        } else if (isset($attributes['tpl-foreach'])) {
+            return new ForNode($tagName, $attributes);
+        } else if (isset($attributes['tpl-include'])) {
+            return new IncludeNode($tagName, $attributes);
+        } else if (isset($attributes['tpl-selected'])) {
+            return new AttributeNode($tagName, $attributes, 'tpl-selected', 'selected');
+        } else if (isset($attributes['tpl-checked'])) {
+            return new AttributeNode($tagName, $attributes, 'tpl-checked', 'checked');
+        } else {
+            return new TagNode($tagName, $attributes);
+        }
     }
 
     public function tagEndAction($tagName) {
@@ -57,7 +59,14 @@ class TreeBuilderActions {
     }
 
     public function voidTagAction($tagName, $attributes, $hasSlashClose) {
-        $node = new VoidTagNode($tagName, $attributes, $hasSlashClose);
+        $node = $this->createTag($tagName, $attributes);
+
+        $node->makeVoid();
+
+        if ($hasSlashClose) {
+            $node->addSlashClose();
+        }
+
         $this->currentNode()->addChild($node);
     }
 
