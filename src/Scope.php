@@ -2,11 +2,14 @@
 
 namespace tplLib;
 
+use \RuntimeException;
+use \Error;
+
 class Scope {
     public $mainTemplatePath;
 
     private $layers = [];
-    private $translations = [];
+    private $translations;
 
     public function __construct($data = [],
                                 $translations = [],
@@ -48,7 +51,7 @@ class Scope {
 
         try {
             $result = $this->evaluateSub($expression, $data);
-        } catch (\Error $error) {
+        } catch (Error $error) {
             $this->throwEvaluateException($expression);
         }
 
@@ -62,7 +65,7 @@ class Scope {
     }
 
     private function throwEvaluateException($expression) {
-        throw new \Exception("error evaluating: '$expression'");
+        throw new RuntimeException("error evaluating: '$expression'");
     }
 
     private function isTranslation($expression) {
@@ -83,7 +86,7 @@ class Scope {
 
     public function removeLayer() {
         if (count($this->layers) == 1) {
-            throw new \Exception("can't remove last layer");
+            throw new RuntimeException("can't remove last layer");
         }
 
         array_pop($this->layers);

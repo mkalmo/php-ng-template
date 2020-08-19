@@ -112,7 +112,7 @@ class LexerTests extends ExtendedTestCase {
     function test() {
         $input = '<input/>&<input/>';
 
-        $tokens = (new HtmlLexer($input))->tokenize();
+        (new HtmlLexer($input))->tokenize();
     }
 
     function invalidSymbol() {

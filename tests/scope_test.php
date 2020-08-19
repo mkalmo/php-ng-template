@@ -64,7 +64,7 @@ class ScopeTests extends ExtendedTestCase {
     function removingLastScopeLayerThrows() {
         $scope = new Scope();
 
-        $this->expectException(new Exception("can't remove last layer"));
+        $this->expectException(new RuntimeException("can't remove last layer"));
 
         $scope->removeLayer();
     }
@@ -77,7 +77,7 @@ class ScopeTests extends ExtendedTestCase {
     }
 
     function replaceCurlyExpressionEvalError() {
-        $this->expectException(new Exception("error evaluating: '1a'"));
+        $this->expectException(new RuntimeException("error evaluating: '1a'"));
 
         (new Scope())->replaceCurlyExpression('{{ 1a }}');
     }

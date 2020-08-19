@@ -4,22 +4,22 @@ namespace tplLib;
 
 abstract class AbstractNode {
 
-    protected $token;
+    protected $name;
 
     protected $children = [];
 
-    public function __construct($token) {
-        $this->token = $token;
+    public function __construct($name) {
+        $this->name = $name;
     }
 
     public abstract function render($scope);
 
     public function getTagName() {
-        return $this->token;
+        return $this->name;
     }
 
     public function getTokenContents() {
-        return $this->token->getContents();
+        return $this->name->getContents();
     }
 
     public function getChildren() {

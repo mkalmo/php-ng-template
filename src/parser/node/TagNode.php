@@ -2,18 +2,21 @@
 
 namespace tplLib;
 
+use \RuntimeException;
+
 require_once 'RootNode.php';
 require_once 'AbstractNode.php';
 
 class TagNode extends AbstractNode {
 
-    protected $name;
     protected $attributes;
     protected $isVoidTag;
     protected $hasSlashClose;
+    private $tplAttributes = [];
+    private $tmpAttributes = [];
 
     public function __construct($name, $attributes) {
-        $this->name = $name;
+        parent::__construct($name);
         $this->attributes = $attributes;
     }
 
@@ -23,17 +26,34 @@ class TagNode extends AbstractNode {
 
     public function addSlashClose() {
         if (!$this->isVoidTag) {
-            throw new \Exception('must be void tag');
+            throw new RuntimeException('must be void tag');
         }
 
         $this->hasSlashClose = true;
     }
 
     public function render($scope) {
+        $this->processTplAttributes($scope);
+
         if ($this->isVoidTag) {
-            return $this->renderVoidTag($scope);
+            $result = $this->renderVoidTag($scope);
         } else {
-            return $this->renderBodyTag($scope);
+            $result = $this->renderBodyTag($scope);
+        }
+
+        $this->tmpAttributes = [];
+
+        return $result;
+    }
+
+    public function processTplAttributes($scope) {
+        foreach ($this->tplAttributes as $each) {
+            $tplName = $each[0];
+            $htmlName = $each[1];
+
+            if ($scope->evaluate($this->getExpression($tplName))) {
+                $this->tmpAttributes[$htmlName] = sprintf('"%s"', $htmlName);
+            }
         }
     }
 
@@ -66,18 +86,32 @@ class TagNode extends AbstractNode {
                 continue;
             }
 
-            $result .= ' ' . $key;
+            $result .= $this->formatAttribute($key,
+                $scope->replaceCurlyExpression($value));
+        }
 
-            if ($value !== null) {
-                $result .= '=' . $scope->replaceCurlyExpression($value);
+        // tpl-selected, tpl-checked
+        foreach ($this->tplAttributes as $each) {
+            $tplName = $each[0];
+            $htmlName = $each[1];
+
+            if ($scope->evaluate($this->getExpression($tplName))) {
+                $result .= $this->formatAttribute($htmlName,
+                    sprintf('"%s"', $htmlName));
             }
         }
 
         return $result;
     }
 
-    public function getTagName() {
-        return $this->name;
+    private function formatAttribute($name, $value) {
+        return $value === null
+            ? sprintf(' %s', $name)
+            : sprintf(' %s=%s', $name, $value);
+    }
+
+    public function addTplAttribute($tplAttributeName, $attributeName) {
+        $this->tplAttributes[] = [$tplAttributeName, $attributeName];
     }
 
     protected function getExpression($attributeName) {
@@ -88,6 +122,8 @@ class TagNode extends AbstractNode {
 
         return $value;
     }
+
+
 
 
 }

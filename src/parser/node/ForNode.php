@@ -22,6 +22,7 @@ class ForNode extends TagNode {
         foreach ($list as $each) {
 
             $scope->addLayer([
+                'index' => $index,
                 'first' => $index === 0,
                 'last' => $index === count($list) - 1,
                 $variableName => $each

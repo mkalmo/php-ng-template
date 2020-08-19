@@ -10,7 +10,7 @@ require_once('ParseException.php');
 class HtmlParser {
 
     private $p;
-    private $input = [];
+    private $input;
     private $actions;
     private $consumedPos = 0;
 
@@ -118,7 +118,7 @@ class HtmlParser {
             } else if ($this->isHtmlElement()) {
                 $this->htmlElement();
             } else {
-                return new ParseException(
+                throw new ParseException(
                     'unknown token type: ' . $this->ltt(),
                     $this->consumedPos);
             }

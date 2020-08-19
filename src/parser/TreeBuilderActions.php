@@ -10,7 +10,6 @@ require_once 'node/WsNode.php';
 require_once 'node/IfNode.php';
 require_once 'node/ForNode.php';
 require_once 'node/IncludeNode.php';
-require_once 'node/AttributeNode.php';
 
 class TreeBuilderActions {
 
@@ -40,18 +39,24 @@ class TreeBuilderActions {
 
     private function createTag($tagName, $attributes) {
         if (isset($attributes['tpl-if'])) {
-            return new IfNode($tagName, $attributes);
+            $node = new IfNode($tagName, $attributes);
         } else if (isset($attributes['tpl-foreach'])) {
-            return new ForNode($tagName, $attributes);
+            $node = new ForNode($tagName, $attributes);
         } else if (isset($attributes['tpl-include'])) {
-            return new IncludeNode($tagName, $attributes);
-        } else if (isset($attributes['tpl-selected'])) {
-            return new AttributeNode($tagName, $attributes, 'tpl-selected', 'selected');
-        } else if (isset($attributes['tpl-checked'])) {
-            return new AttributeNode($tagName, $attributes, 'tpl-checked', 'checked');
+            $node = new IncludeNode($tagName, $attributes);
         } else {
-            return new TagNode($tagName, $attributes);
+            $node = new TagNode($tagName, $attributes);
         }
+
+        if (isset($attributes['tpl-selected'])) {
+            $node->addTplAttribute('tpl-selected', 'selected');
+        }
+
+        if (isset($attributes['tpl-checked'])) {
+            $node->addTplAttribute('tpl-checked', 'checked');
+        }
+
+        return $node;
     }
 
     public function tagEndAction($tagName) {
