@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace tplLib;
 
@@ -12,8 +12,6 @@ class TagNode extends AbstractNode {
     protected $attributes;
     protected $isVoidTag;
     protected $hasSlashClose;
-    private $tplAttributes = [];
-    private $tmpAttributes = [];
 
     public function __construct($name, $attributes) {
         parent::__construct($name);
@@ -33,28 +31,9 @@ class TagNode extends AbstractNode {
     }
 
     public function render($scope) {
-        $this->processTplAttributes($scope);
-
-        if ($this->isVoidTag) {
-            $result = $this->renderVoidTag($scope);
-        } else {
-            $result = $this->renderBodyTag($scope);
-        }
-
-        $this->tmpAttributes = [];
-
-        return $result;
-    }
-
-    public function processTplAttributes($scope) {
-        foreach ($this->tplAttributes as $each) {
-            $tplName = $each[0];
-            $htmlName = $each[1];
-
-            if ($scope->evaluate($this->getExpression($tplName))) {
-                $this->tmpAttributes[$htmlName] = sprintf('"%s"', $htmlName);
-            }
-        }
+        return $this->isVoidTag
+            ? $this->renderVoidTag($scope)
+            : $this->renderBodyTag($scope);
     }
 
     public function renderVoidTag($scope) {
@@ -90,28 +69,35 @@ class TagNode extends AbstractNode {
                 $scope->replaceCurlyExpression($value));
         }
 
-        // tpl-selected, tpl-checked
-        foreach ($this->tplAttributes as $each) {
-            $tplName = $each[0];
-            $htmlName = $each[1];
+        if ($this->hasAttribute('tpl-checked')) {
+            if ($scope->evaluate($this->getExpression('tpl-checked'))) {
+                $result .= ' checked="checked"';
+            }
+        }
 
-            if ($scope->evaluate($this->getExpression($tplName))) {
-                $result .= $this->formatAttribute($htmlName,
-                    sprintf('"%s"', $htmlName));
+        if ($this->hasAttribute('tpl-selected')) {
+            if ($scope->evaluate($this->getExpression('tpl-selected'))) {
+                $result .= ' selected="selected"';
             }
         }
 
         return $result;
     }
 
+    private function hasAttribute($name) {
+        foreach ($this->attributes as $key => $value) {
+            if ($key === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function formatAttribute($name, $value) {
         return $value === null
             ? sprintf(' %s', $name)
             : sprintf(' %s=%s', $name, $value);
-    }
-
-    public function addTplAttribute($tplAttributeName, $attributeName) {
-        $this->tplAttributes[] = [$tplAttributeName, $attributeName];
     }
 
     protected function getExpression($attributeName) {

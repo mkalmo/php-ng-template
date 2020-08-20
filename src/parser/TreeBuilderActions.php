@@ -39,24 +39,14 @@ class TreeBuilderActions {
 
     private function createTag($tagName, $attributes) {
         if (isset($attributes['tpl-if'])) {
-            $node = new IfNode($tagName, $attributes);
+            return new IfNode($tagName, $attributes);
         } else if (isset($attributes['tpl-foreach'])) {
-            $node = new ForNode($tagName, $attributes);
+            return new ForNode($tagName, $attributes);
         } else if (isset($attributes['tpl-include'])) {
-            $node = new IncludeNode($tagName, $attributes);
+            return new IncludeNode($tagName, $attributes);
         } else {
-            $node = new TagNode($tagName, $attributes);
+            return new TagNode($tagName, $attributes);
         }
-
-        if (isset($attributes['tpl-selected'])) {
-            $node->addTplAttribute('tpl-selected', 'selected');
-        }
-
-        if (isset($attributes['tpl-checked'])) {
-            $node->addTplAttribute('tpl-checked', 'checked');
-        }
-
-        return $node;
     }
 
     public function tagEndAction($tagName) {

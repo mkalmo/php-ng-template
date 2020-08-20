@@ -119,7 +119,7 @@ class TemplateTests extends ExtendedTestCase {
         $this->assertEqual($expectedTrue, $tree->render($scope));
     }
 
-    function _tplCheckedInLoop() {
+    function tplCheckedInLoop() {
         $input = '<input tpl-foreach="$items as $item" tpl-checked="$item === 2" />';
         $expected = '<input/><input checked="checked"/><input/>';
 
