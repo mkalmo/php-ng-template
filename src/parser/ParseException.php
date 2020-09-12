@@ -2,9 +2,7 @@
 
 namespace tplLib;
 
-use \RuntimeException;
-
-class ParseException extends RuntimeException {
+class ParseException extends \RuntimeException {
 
     public $message;
     public $pos;

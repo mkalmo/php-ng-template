@@ -22,7 +22,7 @@ class BundleBuilder {
         $dependencies = [];
         $namespace = '';
         foreach (file($filePath) as $line) {
-            if (trim($line) === '<?php') {
+            if (substr(trim($line), 0, 5)  === '<?php') {
                 continue;
             }
 

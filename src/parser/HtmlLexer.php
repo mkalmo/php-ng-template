@@ -245,7 +245,7 @@ class HtmlLexer {
     }
 
     public function isTAG_NAME_CHAR() {
-        return preg_match('/^[-_\.:a-zA-Z0-9]$/', $this->c);
+        return preg_match('/^[-_.:a-zA-Z0-9]$/', $this->c);
     }
 
     private function matchBetweenStrings($start, $end) {

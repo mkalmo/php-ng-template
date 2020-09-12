@@ -2,8 +2,6 @@
 
 namespace tplLib;
 
-use \RuntimeException;
-
 require_once 'RootNode.php';
 require_once 'AbstractNode.php';
 
@@ -24,7 +22,7 @@ class TagNode extends AbstractNode {
 
     public function addSlashClose() {
         if (!$this->isVoidTag) {
-            throw new RuntimeException('must be void tag');
+            throw new \RuntimeException('must be void tag');
         }
 
         $this->hasSlashClose = true;
@@ -45,10 +43,7 @@ class TagNode extends AbstractNode {
 
     public function renderBodyTag($scope) {
 
-        $contents = '';
-        foreach ($this->children as $child) {
-            $contents .= $child->render($scope);
-        }
+        $contents = $this->renderContents($scope);
 
         if ($this->name === 'tpl') {
             return $contents;
@@ -58,16 +53,19 @@ class TagNode extends AbstractNode {
             $this->name, $this->attributeString($scope), $contents);
     }
 
+    private function renderContents($scope) {
+        $contents = '';
+        foreach ($this->children as $child) {
+            $contents .= $child->render($scope);
+        }
+
+        return $this->hasAttribute('tpl-trim-contents')
+            ? trim($contents)
+            : $contents;
+    }
+
     protected function attributeString($scope) {
         $result = '';
-        foreach ($this->attributes as $key => $value) {
-            if (strpos($key, 'tpl-') === 0) {
-                continue;
-            }
-
-            $result .= $this->formatAttribute($key,
-                $scope->replaceCurlyExpression($value));
-        }
 
         if ($this->hasAttribute('tpl-checked')) {
             if ($scope->evaluate($this->getExpression('tpl-checked'))) {
@@ -79,6 +77,45 @@ class TagNode extends AbstractNode {
             if ($scope->evaluate($this->getExpression('tpl-selected'))) {
                 $result .= ' selected="selected"';
             }
+        }
+
+        $attributesToSkip = [];
+        if ($this->hasAttribute('tpl-class')) {
+            $parts = preg_split('/\s+if\s+/', $this->getExpression('tpl-class'));
+
+            if (count($parts) !== 2) {
+                throw new \RuntimeException(
+                    "invalid expression for tpl-class");
+            }
+
+            $cssClasses = [];
+            if ($this->hasAttribute("class")) {
+                $cssClasses[] = $this->getExpression('class');
+                $attributesToSkip[] = 'class';
+            }
+
+            $cssClass = trim($parts[0]);
+            $expression = trim($parts[1]);
+
+            if ($scope->evaluate($expression)) {
+                $cssClasses[] = $cssClass;
+            }
+
+            if (!empty($cssClasses)) {
+                $result .= sprintf(' class="%s"', join(' ', $cssClasses));
+            }
+        }
+
+        foreach ($this->attributes as $key => $value) {
+            if (strpos($key, 'tpl-') === 0) {
+                continue;
+            }
+            if (in_array($key, $attributesToSkip)) {
+                continue;
+            }
+
+            $result .= $this->formatAttribute($key,
+                $scope->replaceCurlyExpression($value));
         }
 
         return $result;

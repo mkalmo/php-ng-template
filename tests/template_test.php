@@ -130,6 +130,47 @@ class TemplateTests extends ExtendedTestCase {
         $this->assertEqual($expected, $tree->render($scope));
     }
 
+    function tplClass() {
+        $input = '<input tpl-class="a if $flag" />';
+        $expectedTrue = '<input class="a"/>';
+        $expectedFalse = '<input/>';
+
+        $tree = $this->buildTree($input);
+
+        $scope = new Scope(['flag' => true]);
+
+        $this->assertEqual($expectedTrue, $tree->render($scope));
+
+        $scope = new Scope(['flag' => false]);
+
+        $this->assertEqual($expectedFalse, $tree->render($scope));
+    }
+
+    function tplClassAddedToExisting() {
+        $input = '<input class="a" tpl-class="b if $flag" />';
+        $expectedTrue = '<input class="a b"/>';
+        $expectedFalse = '<input class="a"/>';
+
+        $tree = $this->buildTree($input);
+
+        $scope = new Scope(['flag' => true]);
+
+        $this->assertEqual($expectedTrue, $tree->render($scope));
+
+        $scope = new Scope(['flag' => false]);
+
+        $this->assertEqual($expectedFalse, $tree->render($scope));
+    }
+
+    function tplTrimContents() {
+        $input = '<div tpl-trim-contents> a </div>';
+        $expected = '<div>a</div>';
+
+        $tree = $this->buildTree($input);
+
+        $this->assertEqual($expected, $tree->render(new Scope()));
+    }
+
     function tplTagIsRemovedButContentRemains() {
         $input = '<tpl>a</tpl>';
         $expected = 'a';

@@ -7,9 +7,6 @@ require_once('HtmlParser.php');
 require_once('TreeBuilderActions.php');
 require_once('ParseException.php');
 
-use \Exception;
-use \RuntimeException;
-
 class FileParser {
 
     private $filePath;
@@ -28,7 +25,7 @@ class FileParser {
 
             (new HtmlParser($tokens, $builder))->parse();
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw $this->error($e);
         }
 
@@ -41,7 +38,7 @@ class FileParser {
             realpath($this->filePath),
             $this->locationString($e->pos));
 
-        return new RuntimeException($message);
+        return new \RuntimeException($message);
     }
 
     private function locationString($pos) {
