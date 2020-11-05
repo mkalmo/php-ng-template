@@ -42,7 +42,7 @@ Hello!
 ### Using functions
 
 ```
-{{ join(', ', $list }}
+{{ join(', ', $list) }}
 ```
 
 Will render:
@@ -73,6 +73,44 @@ Will render:
 
 ```
 <div>1</div><div>2</div><div>3</div>
+```
+
+### tpl tag is removed from output
+
+```
+a<tpl tpl-if="!$flag">b</tpl>c
+```
+
+Will render:
+
+```
+abc
+```
+
+### tpl-trim-contents attribute allows code indentation
+
+```
+<tpl tpl-foreach="[1, 2, 3] as $i" tpl-trim-contents>
+    {{ $i }}
+</tpl>
+```
+
+Will render:
+
+```
+123
+```
+
+### tpl-class provides conditional css classes
+
+```
+<div class="a" tpl-class="b if 2 > 1"></div>
+```
+
+Will render:
+
+```
+<div class="a b"></div>
 ```
 
 ### Includes
