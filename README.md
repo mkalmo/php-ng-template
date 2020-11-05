@@ -8,6 +8,7 @@ require_once 'lib/tpl.php';
 $data = [
   'greeting' => 'Hello!',
   'flag' => false,  
+  'value' => 1,  
   'list' => [1, 2, 3],
   'path' => 'sub.html'  
 ];
@@ -104,13 +105,37 @@ Will render:
 ### tpl-class provides conditional css classes
 
 ```
-<div class="a" tpl-class="b if 2 > 1"></div>
+<div class="a" tpl-class="b if $value > 0"></div>
 ```
 
 Will render:
 
 ```
 <div class="a b"></div>
+```
+
+### tpl-checked is for marking checkboxes and radios checked
+
+```
+<input type="radio" tpl-checked="$value > 0">
+```
+
+Will render:
+
+```
+<input checked="checked" type="radio">
+```
+
+### tpl-selected is for marking options selected
+
+```
+<option tpl-selected="$value > 0">Option 1</option>
+```
+
+Will render:
+
+```
+<option selected="selected">Option 1</option>
 ```
 
 ### Includes
