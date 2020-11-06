@@ -88,7 +88,7 @@ Will render:
 abc
 ```
 
-### tpl-trim-contents attribute allows code indentation
+### tpl-trim-contents attribute allows source code indentation
 
 ```
 <tpl tpl-foreach="[1, 2, 3] as $i" tpl-trim-contents>
@@ -100,6 +100,20 @@ Will render:
 
 ```
 123
+```
+
+### In foreach body there are special variables $first and $last 
+
+```
+<tpl tpl-foreach="[1, 2, 3] as $each" tpl-trim-contents>
+    {{ $each }}<tpl tpl-if="!$last">, </tpl>
+</tpl>
+```
+
+Will render:
+
+```
+1, 2, 3
 ```
 
 ### tpl-class provides conditional css classes
