@@ -55,13 +55,23 @@ class TagNode extends AbstractNode {
 
     private function renderContents($scope) {
         $contents = '';
-        foreach ($this->children as $child) {
-            $contents .= $child->render($scope);
+        $isTrim = $this->hasAttribute('tpl-trim-contents');
+
+        foreach ($this->children as $index => $child) {
+            $isLast = $index === count($this->children) - 1;
+
+            if ($isTrim && $child instanceof WsNode) {
+                continue;
+            }
+
+            if ($isTrim && $isLast && $child instanceof TextNode) {
+                $contents .= rtrim($child->render($scope));
+            } else {
+                $contents .= $child->render($scope);
+            }
         }
 
-        return $this->hasAttribute('tpl-trim-contents')
-            ? trim($contents)
-            : $contents;
+        return $contents;
     }
 
     protected function attributeString($scope) {
@@ -145,8 +155,4 @@ class TagNode extends AbstractNode {
 
         return $value;
     }
-
-
-
-
 }
