@@ -68,14 +68,20 @@ class TreeBuilderActions {
     public function staticElementAction($token) {
 
         if ($token->type === HtmlLexer::HTML_TEXT) {
-            $node = new TextNode($token->text);
-        } else if ($token->type === HtmlLexer::SEA_WS) {
-            $node = new WsNode($token->text);
-        } else {
-            $node = new MiscNode($token->text);
-        }
+            $wholeText = $token->text;
+            $trimmed = rtrim($wholeText);
+            $whiteSpace = substr($wholeText, strlen($trimmed));
 
-        $this->currentNode()->addChild($node);
+            $this->currentNode()->addChild(new TextNode($trimmed));
+            if (!empty($whiteSpace)) {
+                $this->currentNode()->addChild(new WsNode($whiteSpace));
+            }
+
+        } else if ($token->type === HtmlLexer::SEA_WS) {
+            $this->currentNode()->addChild(new WsNode($token->text));
+        } else {
+            $this->currentNode()->addChild(new MiscNode($token->text));
+        }
     }
 }
 

@@ -20,7 +20,7 @@ class TreeBuilderTests extends ExtendedTestCase {
 
         $actual = $this->asString($tree);
 
-        $expected = '[W, T, br[], W, T]';
+        $expected = '[W, T, W, br[], W, T, W]';
 
         $this->assertEqual($expected, $actual);
     }

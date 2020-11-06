@@ -163,8 +163,13 @@ class TemplateTests extends ExtendedTestCase {
     }
 
     function tplTrimContents() {
-        $input = '<div tpl-trim-contents> a </div>';
-        $expected = '<div>a</div>';
+        $input = '<tpl tpl-trim-contents>
+                    a
+                    <br>
+                    b
+                 </tpl>';
+
+        $expected = 'a<br>b';
 
         $tree = $this->buildTree($input);
 

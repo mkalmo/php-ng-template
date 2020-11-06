@@ -58,17 +58,12 @@ class TagNode extends AbstractNode {
         $isTrim = $this->hasAttribute('tpl-trim-contents');
 
         foreach ($this->children as $index => $child) {
-            $isLast = $index === count($this->children) - 1;
 
             if ($isTrim && $child instanceof WsNode) {
                 continue;
             }
 
-            if ($isTrim && $isLast && $child instanceof TextNode) {
-                $contents .= rtrim($child->render($scope));
-            } else {
-                $contents .= $child->render($scope);
-            }
+            $contents .= $child->render($scope);
         }
 
         return $contents;
