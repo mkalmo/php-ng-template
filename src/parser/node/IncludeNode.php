@@ -2,8 +2,6 @@
 
 namespace tplLib;
 
-use http\Exception\RuntimeException;
-
 require_once 'TagNode.php';
 require_once __DIR__ . '/../helpers.php';
 
@@ -13,8 +11,8 @@ class IncludeNode extends TagNode {
 
         $path = $scope->replaceCurlyExpression($this->getExpression('tpl-include'));
 
-        if (strlen($path) === 0) {
-            throw new RuntimeException("tpl-include file path is missing");
+        if (empty($path)) {
+            throw new \RuntimeException("tpl-include file path is missing");
         }
 
         $path = $scope->mainTemplatePath . '/' . $path;
