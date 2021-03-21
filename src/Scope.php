@@ -24,7 +24,7 @@ class Scope {
             '|{{(.+?)}}|im',
             function ($matches) {
                 $result = $this->evaluate(trim($matches[1]));
-                return htmlspecialchars($result, ENT_NOQUOTES);
+                return htmlspecialchars($result, ENT_QUOTES | ENT_HTML5);
             },
             $text);
     }
@@ -32,9 +32,9 @@ class Scope {
     public function evaluate($expression) {
         $isError = false;
 
-        $handler = function ($errno, $errstr, $errfile, $errline)
+        $handler = function ($errno, $errStr, $errFile, $errLine)
         use (&$isError) {
-            $isError = $errno !== E_NOTICE;
+            $isError = ! in_array($errno, [E_WARNING, E_NOTICE]);
         };
 
         $data = $this->getData();
@@ -49,20 +49,18 @@ class Scope {
         try {
             $result = $this->evaluateSub($expression, $data);
         } catch (\Error $error) {
-            $this->throwEvaluateException($expression);
+            throw new \RuntimeException(
+                sprintf('Error: %s on evaluating expression %s',
+                    $error->getMessage(), $expression));
         }
 
         set_error_handler($oldHandler);
 
         if ($isError) {
-            $this->throwEvaluateException($expression);
+            throw new \RuntimeException("Error on evaluating: '$expression'");
         }
 
         return $result;
-    }
-
-    private function throwEvaluateException($expression) {
-        throw new \RuntimeException("error evaluating: '$expression'");
     }
 
     private function isTranslation($expression) {
@@ -74,7 +72,7 @@ class Scope {
             ${ $key_8slSL29x } = $value_8slSL29x;
         }
 
-        return @eval('return ' . $expression_8slSL29x . ';');
+        return eval('return ' . $expression_8slSL29x . ';');
     }
 
     public function addLayer($data = []) {
@@ -99,7 +97,7 @@ class Scope {
         return null;
     }
 
-    public function getData() {
+    private function getData() : array {
         $data = [];
         foreach ($this->layers as $layer) {
             foreach ($layer as $key => $value) {
