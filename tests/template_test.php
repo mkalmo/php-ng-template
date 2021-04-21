@@ -103,6 +103,22 @@ class TemplateTests extends ExtendedTestCase {
         $this->assertEqual($expectedTrue, $tree->render($scope));
     }
 
+    function tplDisabled() {
+        $input = '<div tpl-disabled="$isDisabled"></div>';
+        $expectedFalse = '<div></div>';
+        $expectedTrue = '<div disabled="disabled"></div>';
+
+        $tree = $this->buildTree($input);
+
+        $scope = new Scope(['isDisabled' => false]);
+
+        $this->assertEqual($expectedFalse, $tree->render($scope));
+
+        $scope = new Scope(['isDisabled' => true]);
+
+        $this->assertEqual($expectedTrue, $tree->render($scope));
+    }
+
     function tplChecked() {
         $input = '<input tpl-checked="$isChecked">';
         $expectedFalse = '<input>';

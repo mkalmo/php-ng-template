@@ -152,6 +152,20 @@ Will render:
 <option selected="selected">Option 1</option>
 ```
 
+### tpl-disabled is for marking elements disabled
+
+```
+<input tpl-disabled="$condition" />
+```
+
+Will render:
+
+```
+<input disabled="disabled" />
+```
+
+if $condition was true
+
 ### Includes
 
 ```

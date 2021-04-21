@@ -77,7 +77,7 @@ class ScopeTests extends ExtendedTestCase {
     }
 
     function replaceCurlyExpressionEvalError() {
-        $this->expectException(new RuntimeException("error evaluating: '1a'"));
+        $this->expectException();
 
         (new Scope())->replaceCurlyExpression('{{ 1a }}');
     }

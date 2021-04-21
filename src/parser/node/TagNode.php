@@ -84,6 +84,12 @@ class TagNode extends AbstractNode {
             }
         }
 
+        if ($this->hasAttribute('tpl-disabled')) {
+            if ($scope->evaluate($this->getExpression('tpl-disabled'))) {
+                $result .= ' disabled="disabled"';
+            }
+        }
+
         $attributesToSkip = [];
         if ($this->hasAttribute('tpl-class')) {
             $parts = preg_split('/\s+if\s+/', $this->getExpression('tpl-class'));
