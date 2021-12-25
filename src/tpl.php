@@ -12,6 +12,8 @@ function renderTemplate($templatePath, $data = [], $translations = []) {
             realpath(dirname($templatePath))));
 
     } catch (Exception $e) {
+        error_log($e->getMessage());
+
         return sprintf('<pre>%s%s%s</pre>', PHP_EOL, $e->getMessage(), PHP_EOL);
     }
 }
