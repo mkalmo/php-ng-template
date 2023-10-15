@@ -126,7 +126,7 @@ class TagNode extends AbstractNode {
             }
 
             $result .= $this->formatAttribute($key,
-                $scope->replaceCurlyExpression($value ?: ''));
+                $scope->replaceCurlyExpression($value ?? ''));
         }
 
         return $result;

@@ -60,7 +60,7 @@ class Scope {
             throw new \RuntimeException("Error on evaluating: '$expression'");
         }
 
-        return $result ?: '';
+        return $result ?? '';
     }
 
     private function isTranslation($expression) {

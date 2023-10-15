@@ -76,6 +76,13 @@ class ScopeTests extends ExtendedTestCase {
         $this->assertEqual("1 2 &amp;&lt;", $actual);
     }
 
+    function replaceCurlyExpressionCanHandleZero() {
+        $actual = (new Scope())->replaceCurlyExpression(
+            '{{ count([]) }}');
+
+        $this->assertEqual("0", $actual);
+    }
+
     function replaceCurlyExpressionEvalError() {
         $this->expectException();
 
